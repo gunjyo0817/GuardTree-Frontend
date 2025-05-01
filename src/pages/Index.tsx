@@ -116,7 +116,7 @@ const Index: React.FC = () => {
       {/* Footer */}
       <footer className="bg-gray-100 py-8 px-4">
         <div className="container mx-auto text-center">
-          <p className="text-gray-600">© 2025 守護樹 - 偏鄉照護數位助手</p>
+          <p className="text-gray-600">© 2025 守護樹 - 個案資料整合與洞察系統</p>
         </div>
       </footer>
     </div>;
