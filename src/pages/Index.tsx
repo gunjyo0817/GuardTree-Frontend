@@ -1,35 +1,24 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-
 const Index: React.FC = () => {
   const navigate = useNavigate();
-  
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-guardian-soft-green to-white py-24 px-4">
         <div className="container mx-auto text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-guardian-green mb-6">
             守護樹
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto">
-            專為偏鄉照護機構打造的數位助手，支援長期個案追蹤與智慧分析
-          </p>
+          <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto">專為仁愛基金會打造的數位助手，支援長期個案追蹤與智慧分析</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button 
-              size="lg" 
-              onClick={() => navigate("/login")}
-              className="bg-guardian-green hover:bg-guardian-light-green"
-            >
+            <Button size="lg" onClick={() => navigate("/login")} className="bg-guardian-green hover:bg-guardian-light-green">
               立即登入
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              onClick={() => window.scrollTo({ top: document.getElementById('features')?.offsetTop, behavior: 'smooth' })}
-            >
+            <Button size="lg" variant="outline" onClick={() => window.scrollTo({
+            top: document.getElementById('features')?.offsetTop,
+            behavior: 'smooth'
+          })}>
               了解更多
             </Button>
           </div>
@@ -118,11 +107,7 @@ const Index: React.FC = () => {
           <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
             為您的偏鄉照護機構導入數位化管理工具，提升工作效率與服務質量
           </p>
-          <Button 
-            size="lg" 
-            onClick={() => navigate("/login")}
-            className="bg-white text-guardian-green hover:bg-gray-100"
-          >
+          <Button size="lg" onClick={() => navigate("/login")} className="bg-white text-guardian-green hover:bg-gray-100">
             登入系統
           </Button>
         </div>
@@ -134,8 +119,6 @@ const Index: React.FC = () => {
           <p className="text-gray-600">© 2025 守護樹 - 偏鄉照護數位助手</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
