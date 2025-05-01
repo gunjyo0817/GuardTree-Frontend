@@ -14,6 +14,7 @@ import FormTemplates from "./pages/FormTemplates";
 import FormBuilder from "./components/forms/FormBuilder";
 import FormRecords from "./pages/FormRecords";
 import Analysis from "./pages/Analysis";
+import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
 
 // Layouts
@@ -54,6 +55,7 @@ const App = () => {
               <Route path="/forms/new" element={<FormBuilder />} />
               <Route path="/forms/records" element={<FormRecords />} />
               <Route path="/analysis" element={<Analysis />} />
+              <Route path="/users" element={<Users />} />
               {/* Add more routes as needed */}
             </Route>
             
