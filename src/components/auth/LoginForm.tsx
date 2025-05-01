@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Github } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 // Define form schema with Zod
 const formSchema = z.object({
@@ -25,6 +27,7 @@ const formSchema = z.object({
 const LoginForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGithubLoading, setIsGithubLoading] = useState(false);
 
   // Initialize the form with react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -61,11 +64,59 @@ const LoginForm = () => {
     }
   };
 
+  const handleGithubLogin = async () => {
+    setIsGithubLoading(true);
+    
+    try {
+      // In a real app, this would redirect to GitHub OAuth
+      // For now, we'll simulate the process
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      toast.success("GitHub 登入成功");
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error("GitHub 登入失敗");
+      console.error("GitHub login error:", error);
+    } finally {
+      setIsGithubLoading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-gray-800">守護樹</h1>
         <p className="text-gray-600 mt-2">偏鄉照護數位助手</p>
+      </div>
+      
+      <Button
+        variant="outline"
+        type="button"
+        disabled={isGithubLoading}
+        onClick={handleGithubLogin}
+        className="w-full mb-6"
+      >
+        {isGithubLoading ? (
+          <span className="flex items-center justify-center">
+            <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+            登入中...
+          </span>
+        ) : (
+          <span className="flex items-center justify-center">
+            <Github className="h-4 w-4 mr-2" />
+            使用 GitHub 登入
+          </span>
+        )}
+      </Button>
+
+      <div className="relative mb-6">
+        <div className="absolute inset-0 flex items-center">
+          <Separator className="w-full" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-white px-2 text-muted-foreground">
+            或使用系統帳號
+          </span>
+        </div>
       </div>
       
       <Form {...form}>
