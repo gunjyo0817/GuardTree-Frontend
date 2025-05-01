@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Google } from "lucide-react";
+// Change from Google to a valid icon that can represent Google
+import { ArrowRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 // Define form schema with Zod
@@ -102,7 +103,8 @@ const LoginForm = () => {
           </span>
         ) : (
           <span className="flex items-center justify-center">
-            <Google className="h-4 w-4 mr-2" />
+            {/* Use the replacement icon */}
+            <span className="bg-white rounded-full flex items-center justify-center mr-2 text-red-500">G</span>
             使用 Google 登入
           </span>
         )}
