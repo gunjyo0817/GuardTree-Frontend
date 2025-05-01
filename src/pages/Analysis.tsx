@@ -1,20 +1,15 @@
-
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Download, RefreshCcw } from "lucide-react";
-
 const Analysis: React.FC = () => {
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">智慧分析</h1>
-          <p className="text-muted-foreground">
-            AI輔助分析個案評估數據與趨勢
-          </p>
+          <p className="text-muted-foreground">AI 輔助分析個案評估數據與趨勢</p>
         </div>
       </div>
 
@@ -315,8 +310,6 @@ const Analysis: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
-
 export default Analysis;
