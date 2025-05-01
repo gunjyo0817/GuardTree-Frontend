@@ -104,9 +104,7 @@ const Index: React.FC = () => {
       <section className="bg-guardian-green py-16 px-4">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-6">立即開始使用守護樹</h2>
-          <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
-            為您的偏鄉照護機構導入數位化管理工具，提升工作效率與服務質量
-          </p>
+          <p className="text-xl text-white mb-8 max-w-2xl mx-auto">為仁愛基金會導入數位化管理個案資料工具，提升工作效率與服務質量</p>
           <Button size="lg" onClick={() => navigate("/login")} className="bg-white text-guardian-green hover:bg-gray-100">
             登入系統
           </Button>
