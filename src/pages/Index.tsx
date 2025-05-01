@@ -39,7 +39,7 @@ const Index: React.FC = () => {
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2">表單系統</h3>
-              <p className="text-gray-700">支援複雜評估表單設計與填寫，使用JSON格式靈活儲存資料</p>
+              <p className="text-gray-700">支援複雜評估表單設計與填寫，使用 JSON 格式靈活儲存資料</p>
             </div>
             
             {/* Feature 2 */}
