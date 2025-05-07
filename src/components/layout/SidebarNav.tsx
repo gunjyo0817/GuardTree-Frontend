@@ -3,13 +3,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { 
   ChevronLeft, 
-  LayoutDashboard, 
-  FilePlus, 
-  FileText, 
   Users, 
-  Settings, 
   LogOut,
-  BarChart
+  BarChart,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,14 +33,9 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
   
   const navItems = [
     {
-      name: "儀表板",
-      href: "/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      name: "新增表單",
-      href: "/forms/new",
-      icon: FilePlus,
+      name: "個案管理",
+      href: "/cases",
+      icon: Users,
     },
     {
       name: "表單紀錄",
@@ -55,20 +47,6 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
       href: "/analysis",
       icon: BarChart,
     },
-    ...(userRole === "admin" 
-      ? [
-          {
-            name: "人員管理",
-            href: "/users",
-            icon: Users,
-          },
-          {
-            name: "系統設定",
-            href: "/settings",
-            icon: Settings,
-          },
-        ] 
-      : []),
   ];
 
   return (

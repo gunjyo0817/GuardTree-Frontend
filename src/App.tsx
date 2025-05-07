@@ -9,13 +9,9 @@ import { useState } from "react";
 // Pages
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
-import Dashboard from "./pages/Dashboard";
-import FormTemplates from "./pages/FormTemplates";
-import FormBuilder from "./components/forms/FormBuilder";
+import CaseManagement from "./pages/CaseManagement";
 import FormRecords from "./pages/FormRecords";
 import Analysis from "./pages/Analysis";
-import Users from "./pages/Users";
-import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 // Layouts
@@ -51,13 +47,9 @@ const App = () => {
                 />
               }
             >
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/forms/templates" element={<FormTemplates />} />
-              <Route path="/forms/new" element={<FormBuilder />} />
+              <Route path="/cases" element={<CaseManagement />} />
               <Route path="/forms/records" element={<FormRecords />} />
               <Route path="/analysis" element={<Analysis />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/settings" element={<Settings />} />
               {/* Add more routes as needed */}
             </Route>
             

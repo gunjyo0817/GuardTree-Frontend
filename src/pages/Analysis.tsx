@@ -1,11 +1,14 @@
+
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Download, RefreshCcw } from "lucide-react";
+
 const Analysis: React.FC = () => {
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">智慧分析</h1>
@@ -58,7 +61,6 @@ const Analysis: React.FC = () => {
       <Tabs defaultValue="summary" className="space-y-4">
         <TabsList>
           <TabsTrigger value="summary">摘要分析</TabsTrigger>
-          <TabsTrigger value="trends">趨勢變化</TabsTrigger>
           <TabsTrigger value="recommendations">建議策略</TabsTrigger>
         </TabsList>
 
@@ -139,56 +141,6 @@ const Analysis: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="trends" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>三個月趨勢分析</CardTitle>
-              <CardDescription>各項能力發展變化軌跡</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[400px] flex items-center justify-center bg-guardian-soft-gray">
-                <p className="text-muted-foreground">趨勢分析圖表將在這裡顯示</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <div className="bg-white p-6 rounded-lg border">
-            <h3 className="font-medium mb-4 flex items-center">
-              <Sparkles className="h-4 w-4 mr-1.5 text-guardian-purple" />
-              AI 趨勢解讀
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium text-sm text-guardian-blue mb-2">社交能力</h4>
-                <p className="text-gray-700">
-                  社交能力呈現持續上升趨勢，特別是在3月中旬後有明顯躍升，這可能與新實施的小組活動策略有關。在不同社交情境中的表現差異正在縮小，顯示社交技能的泛化能力正在增強。
-                </p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-sm text-guardian-green mb-2">自理能力</h4>
-                <p className="text-gray-700">
-                  自理能力整體穩定，但在時間管理方面呈現波動。數據顯示在有明確視覺提示的日子，表現明顯較佳，建議持續使用視覺化的時間表和提醒工具。
-                </p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-sm text-guardian-purple mb-2">學習專注力</h4>
-                <p className="text-gray-700">
-                  學習專注力從2月開始呈現下降趨勢，值得注意的是這與家庭環境變動的時間點一致。近期評估顯示，在安靜環境中的專注表現仍然保持良好，環境刺激是影響其表現的關鍵因素。
-                </p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-sm text-blue-500 mb-2">情緒調節</h4>
-                <p className="text-gray-700">
-                  情緒調節能力波動較大，但整體趨勢是緩步上升。資料顯示，當有成人協助識別情緒並提供調節策略時，王小明能較快恢復平靜。這表明情緒識別是當前可優先發展的目標。
-                </p>
-              </div>
-            </div>
           </div>
         </TabsContent>
 
@@ -310,6 +262,8 @@ const Analysis: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>;
+    </div>
+  );
 };
+
 export default Analysis;
