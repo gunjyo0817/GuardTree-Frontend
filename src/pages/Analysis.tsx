@@ -1,10 +1,11 @@
 
 import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Download, RefreshCcw } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Analysis: React.FC = () => {
   return (
@@ -17,7 +18,7 @@ const Analysis: React.FC = () => {
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white p-4 rounded-lg border">
-        <div className="flex-1 grid gap-4 sm:grid-cols-2">
+        <div className="flex-1 grid gap-4 sm:grid-cols-3">
           <div>
             <label htmlFor="case" className="text-sm font-medium text-gray-700 block mb-1">
               選擇個案
@@ -50,6 +51,16 @@ const Analysis: React.FC = () => {
                 <SelectItem value="form5">吞嚥障礙評估表</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <label htmlFor="date" className="text-sm font-medium text-gray-700 block mb-1">
+              填寫日期
+            </label>
+            <Input
+              type="date"
+              id="date"
+              defaultValue={new Date().toISOString().split('T')[0]}
+            />
           </div>
         </div>
         <Button className="bg-guardian-green hover:bg-guardian-light-green whitespace-nowrap h-10 mt-4 sm:mt-6">
@@ -117,31 +128,6 @@ const Analysis: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>能力評分分析</CardTitle>
-                <CardDescription>檢核表各領域得分</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] flex items-center justify-center bg-guardian-soft-gray">
-                  <p className="text-muted-foreground">能力評分圖將在這裡顯示</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>項目間相關性</CardTitle>
-                <CardDescription>項目間的關聯分析</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] flex items-center justify-center bg-guardian-soft-gray">
-                  <p className="text-muted-foreground">相關性分析圖將在這裡顯示</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
 
         <TabsContent value="recommendations" className="space-y-4">
