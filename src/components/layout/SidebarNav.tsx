@@ -7,7 +7,8 @@ import {
   LogOut,
   BarChart,
   FileText,
-  Settings
+  Settings,
+  UserRound
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,13 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
           href: "/users",
           icon: Settings,
         }]
-      : [])
+      : []),
+    // Profile page for all users
+    {
+      name: "個人資料",
+      href: "/profile",
+      icon: UserRound,
+    }
   ];
 
   return (

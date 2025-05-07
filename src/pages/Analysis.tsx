@@ -35,19 +35,19 @@ const Analysis: React.FC = () => {
             </Select>
           </div>
           <div>
-            <label htmlFor="period" className="text-sm font-medium text-gray-700 block mb-1">
-              分析時間範圍
+            <label htmlFor="form" className="text-sm font-medium text-gray-700 block mb-1">
+              選擇表單
             </label>
-            <Select defaultValue="quarter">
-              <SelectTrigger id="period">
-                <SelectValue placeholder="選擇時間範圍" />
+            <Select defaultValue="form1">
+              <SelectTrigger id="form">
+                <SelectValue placeholder="選擇表單" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="month">近一個月</SelectItem>
-                <SelectItem value="quarter">近三個月</SelectItem>
-                <SelectItem value="half">近半年</SelectItem>
-                <SelectItem value="year">近一年</SelectItem>
-                <SelectItem value="all">所有資料</SelectItem>
+                <SelectItem value="form1">基本能力檢核表</SelectItem>
+                <SelectItem value="form2">三級預防支持需求分級檢核表</SelectItem>
+                <SelectItem value="form3">日常生活功能支持型態評量 – B 版</SelectItem>
+                <SelectItem value="form4">老化現象評估表</SelectItem>
+                <SelectItem value="form5">吞嚥障礙評估表</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -69,8 +69,8 @@ const Analysis: React.FC = () => {
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle>王小明 - 能力發展摘要</CardTitle>
-                  <CardDescription>根據近三個月的評估資料分析</CardDescription>
+                  <CardTitle>王小明 - 基本能力檢核表分析</CardTitle>
+                  <CardDescription>根據最近一次評估資料分析</CardDescription>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm">
@@ -91,7 +91,7 @@ const Analysis: React.FC = () => {
                   AI 智能摘要
                 </h3>
                 <p className="text-gray-700">
-                  王小明在過去三個月的評估數據顯示，他的社交互動能力有顯著提升（+25%），尤其是在小組活動中願意主動參與討論。生活自理能力保持穩定，但在時間管理方面仍需要協助提醒。學習專注力較前次評估有所下降（-10%），可能與近期環境變化相關。整體情緒表現較為穩定，但在面對挫折時的調節能力仍有提升空間。
+                  王小明的基本能力檢核表顯示，他在社交互動能力有顯著表現（85分），生活自理能力居中（65分），但在時間管理與任務規劃方面較弱（40分）。他對結構化活動的參與度高，但在面對開放式任務時需要更多支持。建議加強時間管理訓練並提供視覺提示以增強任務完成度。
                 </p>
               </div>
               
@@ -121,23 +121,23 @@ const Analysis: React.FC = () => {
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>能力領域比較</CardTitle>
-                <CardDescription>各領域發展狀況</CardDescription>
+                <CardTitle>能力評分分析</CardTitle>
+                <CardDescription>檢核表各領域得分</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px] flex items-center justify-center bg-guardian-soft-gray">
-                  <p className="text-muted-foreground">能力雷達圖將在這裡顯示</p>
+                  <p className="text-muted-foreground">能力評分圖將在這裡顯示</p>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>表現波動分析</CardTitle>
-                <CardDescription>跨情境表現穩定性</CardDescription>
+                <CardTitle>項目間相關性</CardTitle>
+                <CardDescription>項目間的關聯分析</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px] flex items-center justify-center bg-guardian-soft-gray">
-                  <p className="text-muted-foreground">表現波動圖將在這裡顯示</p>
+                  <p className="text-muted-foreground">相關性分析圖將在這裡顯示</p>
                 </div>
               </CardContent>
             </Card>

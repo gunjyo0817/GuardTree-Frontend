@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 
 // Pages
@@ -15,6 +15,7 @@ import Analysis from "./pages/Analysis";
 import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
 import FormFill from "./pages/FormFill";
+import UserProfile from "./pages/UserProfile";
 
 // Layouts
 import MainLayout from "./components/layout/MainLayout";
@@ -39,6 +40,9 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<LoginPage />} />
             
+            {/* Redirect to cases page after login */}
+            <Route path="/index" element={<Navigate to="/cases" replace />} />
+            
             {/* Protected Routes would normally be protected with auth middleware */}
             <Route
               path="/"
@@ -54,6 +58,7 @@ const App = () => {
               <Route path="/forms/fill" element={<FormFill />} />
               <Route path="/analysis" element={<Analysis />} />
               <Route path="/users" element={<Users />} />
+              <Route path="/profile" element={<UserProfile />} />
               {/* Add more routes as needed */}
             </Route>
             
