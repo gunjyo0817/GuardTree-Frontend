@@ -1,13 +1,23 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Download, RefreshCcw } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Analysis: React.FC = () => {
+  const [selectedDates] = useState([
+    "2023-05-15",
+    "2023-06-22", 
+    "2023-08-10", 
+    "2023-09-05", 
+    "2023-11-17", 
+    "2024-01-23", 
+    "2024-03-08", 
+    "2024-04-12"
+  ]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -56,11 +66,18 @@ const Analysis: React.FC = () => {
             <label htmlFor="date" className="text-sm font-medium text-gray-700 block mb-1">
               填寫日期
             </label>
-            <Input
-              type="date"
-              id="date"
-              defaultValue={new Date().toISOString().split('T')[0]}
-            />
+            <Select defaultValue={selectedDates[selectedDates.length - 1]}>
+              <SelectTrigger id="date">
+                <SelectValue placeholder="選擇日期" />
+              </SelectTrigger>
+              <SelectContent>
+                {selectedDates.map((date) => (
+                  <SelectItem key={date} value={date}>
+                    {date}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <Button className="bg-guardian-green hover:bg-guardian-light-green whitespace-nowrap h-10 mt-4 sm:mt-6">
