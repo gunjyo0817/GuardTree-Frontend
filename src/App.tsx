@@ -13,6 +13,8 @@ import CaseManagement from "./pages/CaseManagement";
 import FormRecords from "./pages/FormRecords";
 import Analysis from "./pages/Analysis";
 import NotFound from "./pages/NotFound";
+import Users from "./pages/Users";
+import FormFill from "./pages/FormFill";
 
 // Layouts
 import MainLayout from "./components/layout/MainLayout";
@@ -49,7 +51,9 @@ const App = () => {
             >
               <Route path="/cases" element={<CaseManagement />} />
               <Route path="/forms/records" element={<FormRecords />} />
+              <Route path="/forms/fill" element={<FormFill />} />
               <Route path="/analysis" element={<Analysis />} />
+              <Route path="/users" element={<Users />} />
               {/* Add more routes as needed */}
             </Route>
             

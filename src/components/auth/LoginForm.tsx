@@ -44,10 +44,10 @@ const LoginForm = () => {
       // Mock authentication (in a real app, this would be an API call)
       if (values.username === "admin" && values.password === "admin") {
         toast.success("登入成功");
-        navigate("/dashboard");
+        navigate("/cases");
       } else if (values.username === "caregiver" && values.password === "caregiver") {
         toast.success("登入成功");
-        navigate("/dashboard");
+        navigate("/cases");
       } else {
         toast.error("使用者名稱或密碼不正確");
       }
@@ -65,7 +65,7 @@ const LoginForm = () => {
       // For now, we'll simulate the process
       await new Promise(resolve => setTimeout(resolve, 1500));
       toast.success("Google 登入成功");
-      navigate("/dashboard");
+      navigate("/cases");
     } catch (error) {
       toast.error("Google 登入失敗");
       console.error("Google login error:", error);

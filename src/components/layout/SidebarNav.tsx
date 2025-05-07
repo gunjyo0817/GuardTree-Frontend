@@ -6,7 +6,8 @@ import {
   Users, 
   LogOut,
   BarChart,
-  FileText
+  FileText,
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
 }) => {
   const isMobile = useIsMobile();
   
+  // Admin sees all menu items, caregivers only see some
   const navItems = [
     {
       name: "個案管理",
@@ -47,6 +49,14 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
       href: "/analysis",
       icon: BarChart,
     },
+    // Only show Users management for admin role
+    ...(userRole === "admin" 
+      ? [{
+          name: "人員管理",
+          href: "/users",
+          icon: Settings,
+        }]
+      : [])
   ];
 
   return (
