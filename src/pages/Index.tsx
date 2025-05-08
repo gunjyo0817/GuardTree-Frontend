@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -62,17 +63,6 @@ const Index: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-2">智慧分析</h3>
               <p className="text-gray-700">使用AI技術分析個案資料，生成摘要報告與發展趨勢</p>
-            </div>
-            
-            {/* Feature 4 */}
-            <div className="bg-guardian-peach rounded-lg p-6">
-              <div className="bg-white rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">表單模板管理</h3>
-              <p className="text-gray-700">靈活建立和管理表單模板，支援版本控制與權限設定</p>
             </div>
             
             {/* Feature 5 */}

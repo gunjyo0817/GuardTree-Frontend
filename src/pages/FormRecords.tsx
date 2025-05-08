@@ -28,27 +28,6 @@ const FormRecords: React.FC = () => {
       updatedAt: "2025-04-24T14:20:00",
     },
     {
-      id: "record3",
-      title: "張小華 - 三級預防支持檢核",
-      description: "季度評估",
-      category: "三級預防支持需求分級檢核表",
-      updatedAt: "2025-04-20T09:15:00",
-    },
-    {
-      id: "record4",
-      title: "陳小玉 - 老化現象評估",
-      description: "2025年第一季度評估",
-      category: "老化現象評估表",
-      updatedAt: "2025-04-18T16:45:00",
-    },
-    {
-      id: "record5",
-      title: "王小明 - 吞嚥障礙評估",
-      description: "進食觀察",
-      category: "吞嚥障礙評估表",
-      updatedAt: "2025-04-15T11:20:00",
-    },
-    {
       id: "record6",
       title: "李小花 - 基本能力檢核表",
       description: "複評結果",
