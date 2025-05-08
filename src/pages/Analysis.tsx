@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -55,10 +54,7 @@ const Analysis: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="form1">基本能力檢核表</SelectItem>
-                <SelectItem value="form2">三級預防支持需求分級檢核表</SelectItem>
-                <SelectItem value="form3">日常生活功能支持型態評量 – B 版</SelectItem>
-                <SelectItem value="form4">老化現象評估表</SelectItem>
-                <SelectItem value="form5">吞嚥障礙評估表</SelectItem>
+                <SelectItem value="form2">日常生活功能支持型態評量 – B 版</SelectItem>
               </SelectContent>
             </Select>
           </div>
