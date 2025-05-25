@@ -1,18 +1,34 @@
 import axios from 'axios';
 
-// 定義接口和類型
 interface AuthResponse {
-  token: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
+  access_token: string;
+  token_type: string;
+}
+  
+
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+interface UpdatePasswordData {
+  old_password: string;
+  new_password: string;
+}
+
+interface UpdateUserData {
+  name?: string;
+  email?: string;
+}
+
+interface UpdateRoleData {
+  role: string;
 }
 
 // 直接從環境變量獲取API URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 // 創建一個axios實例
 const api = axios.create({
@@ -56,6 +72,14 @@ api.interceptors.response.use(
         localStorage.removeItem('authToken');
         window.location.href = '/login';
       }
+
+      // 處理422錯誤 (請求格式錯誤)
+      if (error.response.status === 422) {
+        const details = error.response.data.detail;
+        if (Array.isArray(details)) {
+          console.error('Validation errors:', details);
+        }
+      }
     } else if (error.request) {
       // 請求已發送但沒有收到響應
       console.error('API Error: No response received', error.request);
@@ -72,38 +96,58 @@ export const apiService = {
   // 認證相關
   auth: {
     login: async (username: string, password: string): Promise<AuthResponse> => {
-      return api.post('/auth/login', { username, password });
-    },
-    register: async (userData: any): Promise<AuthResponse> => {
-      return api.post('/auth/register', userData);
-    },
-    logout: async (): Promise<any> => {
-      return api.post('/auth/logout');
+      const params = new URLSearchParams();
+      params.append('username', username);
+      params.append('password', password);
+      
+      return api.post('/auth/login', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
     },
   },
   
   // 用戶相關
   users: {
-    getProfile: async () => {
-      return api.get('/users/profile');
+    // 獲取所有用戶
+    getAll: async (): Promise<UserData[]> => {
+      return api.get('/users/');
     },
-    updateProfile: async (userData: any) => {
-      return api.put('/users/profile', userData);
+
+    // 創建用戶
+    create: async (userData: { username: string; password: string; name: string; email: string }): Promise<UserData> => {
+      return api.post('/users/', userData);
     },
-    getAllUsers: async () => {
-      return api.get('/users');
+
+    // 獲取當前用戶信息
+    getCurrentUser: async (): Promise<UserData> => {
+      return api.get('/users/me');
     },
-    getUserById: async (id: string) => {
-      return api.get(`/users/${id}`);
+
+    // 更新當前用戶信息
+    updateCurrentUser: async (userData: UpdateUserData): Promise<UserData> => {
+      return api.put('/users/me', userData);
     },
-    createUser: async (userData: any) => {
-      return api.post('/users', userData);
+
+    // 更新當前用戶密碼
+    updatePassword: async (passwordData: UpdatePasswordData): Promise<void> => {
+      return api.put('/users/me/password', passwordData);
     },
-    updateUser: async (id: string, userData: any) => {
-      return api.put(`/users/${id}`, userData);
+
+    // 獲取特定用戶
+    getById: async (userId: string): Promise<UserData> => {
+      return api.get(`/users/${userId}`);
     },
-    deleteUser: async (id: string) => {
-      return api.delete(`/users/${id}`);
+
+    // 刪除用戶
+    delete: async (userId: string): Promise<void> => {
+      return api.delete(`/users/${userId}`);
+    },
+
+    // 更新用戶角色
+    updateRole: async (userId: string, roleData: UpdateRoleData): Promise<UserData> => {
+      return api.put(`/users/${userId}/role`, roleData);
     },
   },
 };
