@@ -10,6 +10,8 @@ import { toast } from "sonner";
 // Change from Google to a valid icon that can represent Google
 import { ArrowRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+// 導入 API 服務
+import apiService from "@/lib/api";
 
 // Define form schema with Zod
 const formSchema = z.object({
@@ -38,22 +40,45 @@ const LoginForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Mock authentication (in a real app, this would be an API call)
-      if (values.username === "admin" && values.password === "admin") {
-        toast.success("登入成功");
-        navigate("/cases");
-      } else if (values.username === "caregiver" && values.password === "caregiver") {
+      // 使用 API 服務進行登錄請求
+      const response = await apiService.auth.login(values.username, values.password);
+      
+      // 存儲返回的令牌
+      if (response.token) {
+        localStorage.setItem('authToken', response.token);
         toast.success("登入成功");
         navigate("/cases");
       } else {
-        toast.error("使用者名稱或密碼不正確");
+        toast.error("登入失敗，請檢查您的使用者名稱和密碼");
+      }
+      
+      // 保留模擬功能作為後備
+      if (process.env.NODE_ENV === 'development' && !response.token) {
+        // 模擬功能僅在開發環境中使用
+        if (values.username === "admin" && values.password === "admin") {
+          toast.success("開發模式: 登入成功");
+          navigate("/cases");
+        } else if (values.username === "caregiver" && values.password === "caregiver") {
+          toast.success("開發模式: 登入成功");
+          navigate("/cases");
+        } else {
+          toast.error("使用者名稱或密碼不正確");
+        }
       }
     } catch (error) {
       toast.error("登入失敗，請稍後再試");
       console.error("Login error:", error);
+      
+      // 在開發環境中允許使用模擬登錄
+      if (process.env.NODE_ENV === 'development') {
+        if (values.username === "admin" && values.password === "admin") {
+          toast.success("開發模式: 登入成功");
+          navigate("/cases");
+        } else if (values.username === "caregiver" && values.password === "caregiver") {
+          toast.success("開發模式: 登入成功");
+          navigate("/cases");
+        }
+      }
     } finally {
       setIsLoading(false);
     }
@@ -61,8 +86,8 @@ const LoginForm = () => {
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
-      // In a real app, this would redirect to Google OAuth
-      // For now, we'll simulate the process
+      // 這裡可以實現 Google OAuth 登錄
+      // 目前保留模擬功能
       await new Promise(resolve => setTimeout(resolve, 1500));
       toast.success("Google 登入成功");
       navigate("/cases");
