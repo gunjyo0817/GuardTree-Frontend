@@ -6,25 +6,30 @@ interface AuthResponse {
 }
   
 
-interface UserData {
+export interface UserData {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: 'CEO' | 'DIRECTOR' | 'VICE_DIRECTOR' | 'TEAM_LEADER' | 'SUPERVISOR' | 'SOCIAL_WORKER';
+  activate: boolean;
+  created_at: string;
+  isAdmin: boolean;
 }
 
 interface UpdatePasswordData {
-  old_password: string;
   new_password: string;
 }
 
 interface UpdateUserData {
   name?: string;
   email?: string;
+  activate?: boolean;
+  role?: UserData['role'];
+  isAdmin?: boolean;
 }
 
-interface UpdateRoleData {
-  role: string;
+interface UpdateRoleData extends UpdateUserData {
+  role: UserData['role'];
 }
 
 // 直接從環境變量獲取API URL
@@ -90,6 +95,16 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// 角色映射
+export const ROLE_MAPPING = {
+  CEO: '執行長',
+  DIRECTOR: '主任',
+  VICE_DIRECTOR: '副主任',
+  TEAM_LEADER: '組長',
+  SUPERVISOR: '督導 / 班導',
+  SOCIAL_WORKER: '社工 / 教保'
+} as const;
 
 // API函數
 export const apiService = {
