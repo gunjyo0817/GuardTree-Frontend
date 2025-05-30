@@ -1,10 +1,9 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { UserProvider, useUser } from "./contexts/UserContext";
 
 // Pages
 import Index from "./pages/Index";
@@ -22,49 +21,55 @@ import MainLayout from "./components/layout/MainLayout";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  // In a real app, this would come from authentication/context
-  const [mockUserState] = useState({
-    name: "陳主任",
-    role: "admin" as "admin" | "caregiver",
-    isLoggedIn: false, // Set to false initially, would be true after login
-  });
+// 受保護的路由組件
+const ProtectedRoutes = () => {
+  const { user, loading } = useUser();
 
+  if (loading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <div className="text-lg">載入中...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <MainLayout 
+      userName={user.name} 
+      userRole={user.isAdmin ? "admin" : "caregiver"}
+    >
+      <Routes>
+        <Route path="cases" element={<CaseManagement />} />
+        <Route path="forms/records" element={<FormRecords />} />
+        <Route path="forms/fill" element={<FormFill />} />
+        <Route path="analysis" element={<Analysis />} />
+        <Route path="users" element={<Users />} />
+        <Route path="profile" element={<UserProfile />} />
+      </Routes>
+    </MainLayout>
+  );
+};
+
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<LoginPage />} />
-            
-            {/* Redirect to cases page after login */}
-            <Route path="/index" element={<Navigate to="/cases" replace />} />
-            
-            {/* Protected Routes would normally be protected with auth middleware */}
-            <Route
-              path="/"
-              element={
-                <MainLayout
-                  userName={mockUserState.name}
-                  userRole={mockUserState.role}
-                />
-              }
-            >
-              <Route path="/cases" element={<CaseManagement />} />
-              <Route path="/forms/records" element={<FormRecords />} />
-              <Route path="/forms/fill" element={<FormFill />} />
-              <Route path="/analysis" element={<Analysis />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/profile" element={<UserProfile />} />
-              {/* Add more routes as needed */}
-            </Route>
-            
-            {/* Catch-all route for 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <UserProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/index" element={<Navigate to="/cases" replace />} />
+              <Route path="/*" element={<ProtectedRoutes />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+            <Sonner />
+          </UserProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

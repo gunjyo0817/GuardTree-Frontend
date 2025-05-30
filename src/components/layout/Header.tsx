@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ userName, userRole }) => {
           歡迎回來，{userName}
         </h1>
         <p className="text-sm text-gray-500">
-          {userRole === "admin" ? "管理員" : "教保員"}
+          {userRole === "admin" ? "管理員" : ""}
         </p>
       </div>
       <div className="flex items-center gap-4">
@@ -41,8 +41,6 @@ const Header: React.FC<HeaderProps> = ({ userName, userRole }) => {
             <DropdownMenuLabel>我的帳號</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => navigate("/profile")}>個人資料</DropdownMenuItem>
-            <DropdownMenuItem>修改密碼</DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem>登出</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import {
   Table,
   TableBody,
@@ -46,21 +46,15 @@ const editUserSchema = z.object({
   role: z.enum(["CEO", "DIRECTOR", "VICE_DIRECTOR", "TEAM_LEADER", "SUPERVISOR", "SOCIAL_WORKER"]),
   isAdmin: z.boolean(),
   activate: z.boolean(),
-  password: z.string().optional(),
-  password_confirmation: z.string().optional(),
-}).refine((data) => {
-  if (data.password || data.password_confirmation) {
-    return data.password === data.password_confirmation;
-  }
-  return true;
-}, {
-  message: "兩次輸入的密碼不相同",
-  path: ["password_confirmation"],
 });
 
 type EditUserFormData = z.infer<typeof editUserSchema>;
 
-export function UserList() {
+export interface UserListRef {
+  refreshUsers: () => void;
+}
+
+export const UserList = forwardRef<UserListRef>((props, ref) => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
@@ -74,28 +68,8 @@ export function UserList() {
       role: "SOCIAL_WORKER",
       isAdmin: false,
       activate: true,
-      password: "",
-      password_confirmation: "",
     },
   });
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    if (editingUser) {
-      form.reset({
-        name: editingUser.name,
-        email: editingUser.email,
-        role: editingUser.role,
-        isAdmin: editingUser.isAdmin || false,
-        activate: editingUser.activate || false,
-        password: "",
-        password_confirmation: "",
-      });
-    }
-  }, [editingUser, form]);
 
   const fetchUsers = async () => {
     try {
@@ -113,6 +87,26 @@ export function UserList() {
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    refreshUsers: fetchUsers
+  }));
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (editingUser) {
+      form.reset({
+        name: editingUser.name,
+        email: editingUser.email,
+        role: editingUser.role,
+        isAdmin: editingUser.isAdmin,
+        activate: editingUser.activate,
+      });
+    }
+  }, [editingUser, form]);
+
   const handleDelete = async (userId: string) => {
     if (!window.confirm("確定要刪除此用戶嗎？")) return;
 
@@ -126,13 +120,6 @@ export function UserList() {
     }
   };
 
-  const handleToggleActivate = async (user: UserData) => {
-    setEditingUser({
-      ...user,
-      activate: !user.activate
-    });
-  };
-
   const onSubmitEdit = async (data: EditUserFormData) => {
     if (!editingUser) return;
 
@@ -140,18 +127,17 @@ export function UserList() {
       // 更新用戶基本信息
       await apiService.users.updateRole(editingUser.id, {
         role: data.role,
-        name: data.name,
-        email: data.email,
+      });
+
+      await apiService.users.updateAdmin(editingUser.id, {
         isAdmin: data.isAdmin,
+      });
+
+      await apiService.users.updateActivate(editingUser.id, {
         activate: data.activate,
       });
 
-      // 如果有輸入新密碼，則更新密碼
-      if (data.password) {
-        await apiService.users.updatePassword({
-          new_password: data.password,
-        });
-      }
+
 
       toast.success("用戶資料已更新");
       setEditingUser(null);
@@ -175,8 +161,8 @@ export function UserList() {
             <TableRow>
               <TableHead>姓名</TableHead>
               <TableHead>電子郵件</TableHead>
-              <TableHead>角色</TableHead>
-              <TableHead>狀態</TableHead>
+              <TableHead className="!ml-2">角色</TableHead>
+              <TableHead >狀態</TableHead>
               <TableHead className="text-right">操作</TableHead>
             </TableRow>
           </TableHeader>
@@ -192,12 +178,12 @@ export function UserList() {
                     className="flex items-center gap-2 hover:bg-transparent"
                   >
                     {user.activate ? (
-                      <X className="h-4 w-4 text-red-500" />
-                    ) : (
                       <Check className="h-4 w-4 text-green-500" />
+                    ): (
+                      <X className="h-4 w-4 text-red-500" />
                     )}
-                    <span className="ml-2">
-                      {user.activate ? "停用" : "啟用"}
+                    <span className="">
+                      {user.activate ? "啟用" : "停用"}
                     </span>
                   </Button>
                 </TableCell>
@@ -322,32 +308,6 @@ export function UserList() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>新密碼</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password_confirmation"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>確認新密碼</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <DialogFooter>
                 <Button type="submit">確認修改</Button>
               </DialogFooter>
@@ -357,4 +317,4 @@ export function UserList() {
       </Dialog>
     </div>
   );
-} 
+}); 

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { UserList } from "@/components/users/UserList";
+import React, { useState, useRef } from "react";
+import { UserList, UserListRef } from "@/components/users/UserList";
 import { 
   Dialog,
   DialogContent,
@@ -22,16 +22,21 @@ interface NewUserData {
   name: string;
   email: string;
   role: keyof typeof ROLE_MAPPING;
+  activate: boolean;
+  isAdmin: boolean;
 }
 
 const Users: React.FC = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const userListRef = useRef<UserListRef>(null);
   const [newUser, setNewUser] = useState<NewUserData>({
     username: "",
     password: "",
     name: "",
     email: "",
     role: "SOCIAL_WORKER",
+    activate: true,
+    isAdmin: false,
   });
 
   const handleAddUser = async () => {
@@ -45,7 +50,10 @@ const Users: React.FC = () => {
         name: "",
         email: "",
         role: "SOCIAL_WORKER",
+        activate: true,
+        isAdmin: false,
       });
+      userListRef.current?.refreshUsers();
     } catch (error) {
       console.error("Failed to create user:", error);
       toast.error("新增使用者失敗");
@@ -152,7 +160,7 @@ const Users: React.FC = () => {
         </Dialog>
       </div>
 
-      <UserList />
+      <UserList ref={userListRef} />
     </div>
   );
 };

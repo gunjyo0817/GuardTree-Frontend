@@ -17,6 +17,7 @@ export interface UserData {
 }
 
 interface UpdatePasswordData {
+  old_password: string;
   new_password: string;
 }
 
@@ -28,8 +29,21 @@ interface UpdateUserData {
   isAdmin?: boolean;
 }
 
+interface UpdateProfileData {
+  name?: string;
+  email?: string;
+}
+
 interface UpdateRoleData extends UpdateUserData {
   role: UserData['role'];
+}
+
+interface UpdateActivateData {
+  activate: boolean;
+}
+
+interface UpdateAdminData {
+  isAdmin: boolean;
 }
 
 // 直接從環境變量獲取API URL
@@ -163,6 +177,18 @@ export const apiService = {
     // 更新用戶角色
     updateRole: async (userId: string, roleData: UpdateRoleData): Promise<UserData> => {
       return api.put(`/users/${userId}/role`, roleData);
+    },
+
+    updateActivate: async (userId: string, activateData: UpdateActivateData): Promise<UserData> => {
+      return api.put(`/users/${userId}/activate`, activateData);
+    },
+
+    updateAdmin: async (userId: string, adminData: UpdateAdminData): Promise<UserData> => {
+      return api.put(`/users/${userId}/admin`, adminData);
+    },
+
+    updateMe: async (profileData: UpdateProfileData): Promise<UserData> => {
+      return api.put(`/users/me`, profileData);
     },
   },
 };
