@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { apiService } from "@/lib/api";
 import { FormRecordResponse } from "@/types/form";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const supportLabel = {
   4: "4 - 完全肢體協助",
@@ -12,6 +13,26 @@ const supportLabel = {
   0: "0 - 不需協助",
   "-1": "N/A - 不適評估",
 };
+
+const supportColor = {
+  4: "bg-red-200 text-red-800",
+  3: "bg-orange-200 text-orange-800",
+  2: "bg-yellow-200 text-yellow-800",
+  1: "bg-blue-200 text-blue-800",
+  0: "bg-green-200 text-green-800",
+  "-1": "bg-gray-200 text-gray-700",
+};
+
+function groupContent(content: any[]) {
+  // group by activity > item
+  const grouped: Record<string, Record<string, any[]>> = {};
+  content.forEach(q => {
+    if (!grouped[q.activity]) grouped[q.activity] = {};
+    if (!grouped[q.activity][q.item]) grouped[q.activity][q.item] = [];
+    grouped[q.activity][q.item].push(q);
+  });
+  return grouped;
+}
 
 const FormRecordDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,29 +45,78 @@ const FormRecordDetail: React.FC = () => {
     }
   }, [id]);
 
-  if (!record) return <div>載入中...</div>;
+  if (!record) return <div className="text-center py-10 text-gray-400">載入中...</div>;
+
+  const grouped = groupContent(record.content);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <Button variant="outline" onClick={() => navigate(-1)}>返回</Button>
-      <h1 className="text-2xl font-bold">表單詳情</h1>
-      <div className="space-y-2">
-        <div>服務對象：{record.case_name}</div>
-        <div>填寫人員：{record.user_name}</div>
-        <div>建立時間：{new Date(record.created_at).toLocaleString("zh-TW")}</div>
-        <div>表單類型：{record.form_type}</div>
+      <div className="flex items-center justify-between mb-2">
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          返回
+        </Button>
+        <h1 className="text-3xl font-bold tracking-tight">表單詳情</h1>
       </div>
-      <div className="space-y-4">
-        {record.content.map((item, idx) => (
-          <div key={idx} className="border rounded p-3">
-            <div className="font-medium">
-              {item.activity} / {item.item} {item.subitem ? `/ ${item.subitem}` : ""}
-            </div>
-            <div>核心領域：{item.core_area}</div>
-            <div>評分：{supportLabel[item.support_type]}</div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">基本資料</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-base">
+            <div className="text-gray-500">服務對象</div>
+            <div>{record.case_name}</div>
+            <div className="text-gray-500">填寫人員</div>
+            <div>{record.user_name}</div>
+            <div className="text-gray-500">建立時間</div>
+            <div>{new Date(record.created_at).toLocaleString("zh-TW")}</div>
+            <div className="text-gray-500">表單類型</div>
+            <div>{record.form_type}</div>
           </div>
-        ))}
-      </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">評估內容</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-8">
+            {Object.entries(grouped).map(([activity, items]) => (
+              <div key={activity} className="mb-8">
+                <h3 className="font-semibold text-lg mb-4 text-guardian-green">{activity}</h3>
+                <div className="space-y-6">
+                  {Object.entries(items).map(([item, arr]) => (
+                    arr.length > 1 ? (
+                      <div key={item} className="mb-4">
+                        <div className="font-medium mb-2">{item}</div>
+                        <div className="space-y-2 ml-4">
+                          {arr.map((q, idx) => (
+                            <div key={idx} className="flex items-center gap-3">
+                              <span className="text-gray-400 w-6 text-right">{idx + 1}.</span>
+                              <span className="flex-1 font-normal">{q.subitem}</span>
+                              <span className="text-xs text-gray-500">核心領域：{q.core_area}</span>
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${supportColor[q.support_type] || "bg-gray-100 text-gray-700"}`}>
+                                {supportLabel[q.support_type]}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div key={item} className="mb-4 flex items-center gap-3 ml-2">
+                        <span className="font-medium">{item}</span>
+                        <span className="text-xs text-gray-500">核心領域：{arr[0].core_area}</span>
+                        <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${supportColor[arr[0].support_type] || "bg-gray-100 text-gray-700"}`}>
+                          {supportLabel[arr[0].support_type]}
+                        </span>
+                      </div>
+                    )
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
