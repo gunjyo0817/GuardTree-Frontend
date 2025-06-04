@@ -232,6 +232,15 @@ export const apiService = {
     delete: async (caseId: string): Promise<unknown> => {
       return api.delete(`/cases/${caseId}`);
     },
+  },
+
+  llm: {
+    analyze_form_data: async (case_id: string, year: string, question_field: string): Promise<any> => {
+      return api.post(`/llm/analyze/${case_id}/${year}/${question_field}`);
+    },
+    get_analyzed_result: async (case_id: string, year: string, question_field: string): Promise<any> => {
+      return api.get(`/llm/analyze/${case_id}/${year}/${question_field}`);
+    }
   }
 };
 
