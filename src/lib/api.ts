@@ -57,10 +57,10 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30秒超時
+  timeout: 60000, // 增加到60秒，考慮到冷啟動的情況
 });
 
-// 請求攔截器 - 可以在請求發送前添加認證令牌等
+// 請求攔截器
 api.interceptors.request.use(
   (config) => {
     // 從localStorage獲取token（如果有的話）
@@ -75,26 +75,39 @@ api.interceptors.request.use(
   }
 );
 
-// 響應攔截器 - 處理錯誤和響應
+// 響應攔截器
 api.interceptors.response.use(
   (response) => {
-    // 返回成功的數據
     return response.data;
   },
-  (error) => {
-    // 處理常見的錯誤
+  async (error) => {
+    const originalRequest = error.config;
+
+    // 如果是超時錯誤且還沒有重試過
+    if (error.code === 'ECONNABORTED' && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      // 對於登入請求，使用更長的超時時間重試
+      if (originalRequest.url === '/auth/login') {
+        originalRequest.timeout = 90000; // 90秒
+        try {
+          return await axios(originalRequest);
+        } catch (retryError) {
+          return Promise.reject(retryError);
+        }
+      }
+    }
+
+    // 處理其他錯誤
     if (error.response) {
       // 服務器響應了，但狀態碼不是2xx
       console.error('API Error:', error.response.status, error.response.data);
       
-      // 處理401錯誤 (未授權)，可能需要重新登錄
       if (error.response.status === 401) {
-        // 清除令牌並重定向到登錄頁面
         localStorage.removeItem('authToken');
         window.location.href = '/login';
       }
 
-      // 處理422錯誤 (請求格式錯誤)
       if (error.response.status === 422) {
         const details = error.response.data.detail;
         if (Array.isArray(details)) {
@@ -191,6 +204,11 @@ export const apiService = {
 
     updateMe: async (profileData: UpdateProfileData): Promise<UserData> => {
       return api.put(`/users/me`, profileData);
+    },
+
+    // Add admin password update method
+    adminUpdatePassword: async (userId: string, passwordData: { new_password: string }): Promise<void> => {
+      return api.put(`/users/${userId}/admin-password`, passwordData);
     },
   },
 

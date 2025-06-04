@@ -38,6 +38,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Separator } from "@/components/ui/separator";
 
 // 編輯用戶表單的驗證 schema
 const editUserSchema = z.object({
@@ -46,6 +47,17 @@ const editUserSchema = z.object({
   role: z.enum(["CEO", "DIRECTOR", "VICE_DIRECTOR", "TEAM_LEADER", "SUPERVISOR", "SOCIAL_WORKER"]),
   isAdmin: z.boolean(),
   activate: z.boolean(),
+  password: z.string().optional(),
+  confirmPassword: z.string().optional()
+}).refine((data) => {
+  // 如果有輸入密碼，則確認密碼必須匹配
+  if (data.password) {
+    return data.password === data.confirmPassword;
+  }
+  return true;
+}, {
+  message: "密碼不匹配",
+  path: ["confirmPassword"],
 });
 
 type EditUserFormData = z.infer<typeof editUserSchema>;
@@ -103,6 +115,8 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
         role: editingUser.role,
         isAdmin: editingUser.isAdmin,
         activate: editingUser.activate,
+        password: "",
+        confirmPassword: "",
       });
     }
   }, [editingUser, form]);
@@ -120,29 +134,33 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
     }
   };
 
-  const onSubmitEdit = async (data: EditUserFormData) => {
+  const handleSubmit = async (data: EditUserFormData) => {
     if (!editingUser) return;
 
     try {
-      // 更新用戶基本信息
+      // 更新基本信息
       await apiService.users.updateRole(editingUser.id, {
-        role: data.role,
+        role: data.role
       });
 
       await apiService.users.updateAdmin(editingUser.id, {
-        isAdmin: data.isAdmin,
+        isAdmin: data.isAdmin
       });
 
       await apiService.users.updateActivate(editingUser.id, {
-        activate: data.activate,
+        activate: data.activate
       });
 
-
+      // 如果有輸入新密碼，則更新密碼
+      if (data.password) {
+        await apiService.users.adminUpdatePassword(editingUser.id, {
+          new_password: data.password
+        });
+      }
 
       toast.success("用戶資料已更新");
       setEditingUser(null);
-      // 重新獲取用戶列表以更新頁面顯示
-      await fetchUsers();
+      fetchUsers();
     } catch (error) {
       console.error("Failed to update user:", error);
       toast.error("更新用戶資料失敗");
@@ -218,7 +236,7 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitEdit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -308,6 +326,44 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
                   </FormItem>
                 )}
               />
+              <Separator className="my-4" />
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">修改密碼</h4>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>新密碼</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="輸入新密碼"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>確認密碼</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="再次輸入新密碼"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <DialogFooter>
                 <Button type="submit">確認修改</Button>
               </DialogFooter>
