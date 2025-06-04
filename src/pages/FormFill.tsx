@@ -414,19 +414,24 @@ const FormFill: React.FC = () => {
       <p className="font-medium">{label}</p>
       <div className={`grid grid-cols-2 sm:grid-cols-6 gap-4 ${error ? "border border-red-500 rounded" : ""}`}>
         {supportOptions.map((option) => (
-          <label key={option.value} className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer text-xs">
+          <div
+            key={option.value}
+            className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer text-xs"
+            onClick={() => {
+              setAnswers(a => ({ ...a, [question]: option.value }));
+              setTouched(t => ({ ...t, [question]: true }));
+            }}
+          >
             <input
               type="radio"
               name={`q-${question}`}
               value={option.value}
               checked={answers[question] === option.value}
-              onChange={() => {
-                setAnswers(a => ({ ...a, [question]: option.value }));
-                setTouched(t => ({ ...t, [question]: true }));
-              }}
+              onChange={() => {}}
+              className="accent-guardian-green"
             />
             <span>{option.label}</span>
-          </label>
+          </div>
         ))}
       </div>
     </div>
