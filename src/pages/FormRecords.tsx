@@ -11,11 +11,26 @@ import { FormMetadata } from "@/types/form";
 
 const FormRecords: React.FC = () => {
   const navigate = useNavigate();
-  
   const [records, setRecords] = React.useState<FormMetadata[]>([]);
+  const [search, setSearch] = React.useState("");
+  const [year, setYear] = React.useState<string>("");
+
   React.useEffect(() => {
     apiService.form.getAll().then(setRecords);
   }, []);
+
+  // 取得所有年份（去重排序）
+  const years = React.useMemo(() => {
+    const y = Array.from(new Set(records.map(r => r.year))).sort((a, b) => b - a);
+    return y.map(String);
+  }, [records]);
+
+  // 過濾後的紀錄
+  const filteredRecords = records.filter(r => {
+    const matchCase = r.case_name?.includes(search);
+    const matchYear = year ? String(r.year) === year : true;
+    return matchCase && matchYear;
+  });
 
   return (
     <div className="space-y-6">
@@ -40,12 +55,29 @@ const FormRecords: React.FC = () => {
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="relative w-full sm:w-auto">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="搜尋表單..." className="pl-8 w-full sm:w-[300px]" />
+          <Input
+            placeholder="搜尋服務對象..."
+            className="pl-8 w-full sm:w-[300px]"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
-        <Button variant="outline" size="sm">
-          <Filter className="h-4 w-4 mr-1.5" />
-          篩選
-        </Button>
+        <div className="flex items-center gap-2">
+          <select
+            className="border rounded px-2 py-1 text-sm"
+            value={year}
+            onChange={e => setYear(e.target.value)}
+          >
+            <option value=""> 全部年份 </option>
+            {years.map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+          <Button variant="outline" size="sm">
+            <Filter className="h-4 w-4 mr-1.5" />
+            篩選
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
@@ -60,7 +92,7 @@ const FormRecords: React.FC = () => {
         
         <TabsContent value="all" className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {records.map((record) => (
+            {filteredRecords.map((record) => (
               <FormCard
                 key={record.id}
                 id={record.id.toString()}
@@ -77,7 +109,7 @@ const FormRecords: React.FC = () => {
         {formDefinitions.map((form) => (
           <TabsContent key={form.id} value={form.id} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {records
+              {filteredRecords
                 .filter((record) => record.form_type === form.id)
                 .map((record) => (
                   <FormCard
