@@ -124,6 +124,7 @@ function CaseForm({ setCases, setShowNewCaseForm }: { setCases: React.Dispatch<R
 
         <div className="space-y-2">
           <Label>類別</Label>
+          <br />
           <MultiCategorySelect
             value={formData.types}
             onChange={(types) => setFormData({ ...formData, types })}
