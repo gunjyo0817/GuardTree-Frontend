@@ -20,13 +20,13 @@ const FormRecords: React.FC = () => {
     apiService.form.getAll().then(setRecords);
   }, []);
 
-  // 取得所有年份（去重排序）
+  // get all years
   const years = React.useMemo(() => {
     const y = Array.from(new Set(records.map(r => r.year))).sort((a, b) => b - a);
     return y.map(String);
   }, [records]);
 
-  // 過濾後的紀錄
+  // filter records
   const filteredRecords = records.filter(r => {
     const matchCase = r.case_name?.includes(search);
     const matchYear = year ? String(r.year) === year : true;
