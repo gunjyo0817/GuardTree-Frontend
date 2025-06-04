@@ -7,55 +7,40 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, FileText, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface CaseCardProps {
-  id: string;
-  name: string;
-  age?: number;
-  gender?: "male" | "female" | "other";
-  category?: string;
+import { Case } from "@/types/case";
+
+interface CaseCardProps extends Omit<Case, 'created_at'> {
   formsCount: number;
-  lastUpdated: string;
   avatarUrl?: string;
-  status?: "active" | "inactive" | "critical";
   onClick?: () => void;
 }
 
 const CaseCard: React.FC<CaseCardProps> = ({
   id,
   name,
-  age,
   gender,
-  category,
-  formsCount,
-  lastUpdated,
+  types,
+  formsCount=99,
+  updated_at,
   avatarUrl,
-  status = "active",
+  birthdate,
   onClick,
 }) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("zh-TW", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(date);
+  const formatDate = (date: Date) => {
+    return new Date(date).toISOString().split('T')[0]
   };
+
+  // calc age
+  const today = new Date();
+  const birthDate = new Date(birthdate);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
 
   const getInitials = (name: string) => {
     return name.charAt(0).toUpperCase();
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-500";
-      case "inactive":
-        return "bg-gray-500";
-      case "critical":
-        return "bg-red-500";
-      default:
-        return "bg-gray-500";
-    }
   };
 
   return (
@@ -73,27 +58,21 @@ const CaseCard: React.FC<CaseCardProps> = ({
                   {getInitials(name)}
                 </AvatarFallback>
               </Avatar>
-              <span 
-                className={cn(
-                  "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white",
-                  getStatusColor(status)
-                )} 
-              />
             </div>
             <div className="ml-4">
               <h3 className="font-semibold text-lg">{name}</h3>
               <div className="flex items-center text-sm text-gray-500 mt-1">
-                {age && <span className="mr-2">{age} 歲</span>}
+                <span className="mr-2">{age} 歲</span>
                 {gender && (
                   <span className="mr-2">
                     {gender === "male" ? "男" : gender === "female" ? "女" : "其他"}
                   </span>
                 )}
-                {category && (
-                  <Badge variant="outline" className="ml-1">
-                    {category}
+                {types?.map((type) => (
+                  <Badge key={type} variant="outline" className="ml-1">
+                    {type}
                   </Badge>
-                )}
+                ))}
               </div>
             </div>
           </div>
@@ -106,7 +85,7 @@ const CaseCard: React.FC<CaseCardProps> = ({
           </div>
           <div className="flex items-center text-sm text-gray-500">
             <Calendar className="h-4 w-4 mr-1" />
-            <span>更新於：{formatDate(lastUpdated)}</span>
+            <span>更新於：{formatDate(updated_at)}</span>
           </div>
         </div>
       </CardContent>

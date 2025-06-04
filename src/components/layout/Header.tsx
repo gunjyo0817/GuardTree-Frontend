@@ -1,4 +1,3 @@
-
 import React from "react";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "@/contexts/UserContext";
 
 interface HeaderProps {
   userName: string;
@@ -19,6 +19,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ userName, userRole }) => {
   const navigate = useNavigate();
+  const { logout } = useUser();
   
   return (
     <header className="bg-white border-b border-gray-200 py-3 px-6 flex justify-between items-center">
@@ -41,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ userName, userRole }) => {
             <DropdownMenuLabel>我的帳號</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => navigate("/profile")}>個人資料</DropdownMenuItem>
-            <DropdownMenuItem>登出</DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>登出</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

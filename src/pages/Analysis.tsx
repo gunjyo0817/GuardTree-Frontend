@@ -88,7 +88,7 @@ const Analysis: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">智慧分析</h1>
-          <p className="text-muted-foreground">AI 輔助分析個案評估數據與趨勢</p>
+          <p className="text-muted-foreground">AI 輔助分析服務對象評估數據與趨勢</p>
         </div>
       </div>
 
@@ -96,11 +96,11 @@ const Analysis: React.FC = () => {
         <div className="flex-1 grid gap-4 sm:grid-cols-3">
           <div>
             <label htmlFor="case" className="text-sm font-medium text-gray-700 block mb-1">
-              選擇個案
+              選擇服務對象
             </label>
             <Select value={selectedCase} onValueChange={setSelectedCase}>
               <SelectTrigger id="case">
-                <SelectValue placeholder="選擇個案" />
+                <SelectValue placeholder="選擇服務對象" />
               </SelectTrigger>
               <SelectContent> {/* get cases from db */}
                 {/* {cases.map((caseItem) => (

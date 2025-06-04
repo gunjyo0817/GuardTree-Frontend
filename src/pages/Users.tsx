@@ -17,7 +17,6 @@ import { toast } from "sonner";
 import apiService, { ROLE_MAPPING } from "@/lib/api";
 
 interface NewUserData {
-  username: string;
   password: string;
   name: string;
   email: string;
@@ -30,7 +29,6 @@ const Users: React.FC = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const userListRef = useRef<UserListRef>(null);
   const [newUser, setNewUser] = useState<NewUserData>({
-    username: "",
     password: "",
     name: "",
     email: "",
@@ -45,7 +43,6 @@ const Users: React.FC = () => {
       toast.success("已成功新增使用者");
       setShowAddDialog(false);
       setNewUser({
-        username: "",
         password: "",
         name: "",
         email: "",
@@ -82,17 +79,6 @@ const Users: React.FC = () => {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="username">使用者名稱</Label>
-                <Input
-                  id="username"
-                  value={newUser.username}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, username: e.target.value })
-                  }
-                  placeholder="請輸入使用者名稱"
-                />
-              </div>
               <div className="grid gap-2">
                 <Label htmlFor="name">姓名</Label>
                 <Input
