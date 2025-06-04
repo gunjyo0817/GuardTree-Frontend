@@ -248,6 +248,7 @@ export const apiService = {
     getAll: async (): Promise<FormMetadata[]> => {
       return api.get('/forms/');
     },
+  },
 
   llm: {
     analyze_form_data: async (case_id: string, year: string, question_field: string): Promise<any> => {
