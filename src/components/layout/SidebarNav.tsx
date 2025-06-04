@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { 
-  ChevronLeft, 
-  Users, 
+import {
+  ChevronLeft,
+  Users,
   LogOut,
   BarChart,
   FileText,
@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -25,18 +25,18 @@ interface SidebarNavProps {
   userRole: "admin" | "caregiver";
 }
 
-const SidebarNav: React.FC<SidebarNavProps> = ({ 
-  collapsed, 
+const SidebarNav: React.FC<SidebarNavProps> = ({
+  collapsed,
   setCollapsed,
   userRole
 }) => {
   const isMobile = useIsMobile();
   const { logout } = useUser();
-  
+
   // Admin sees all menu items, caregivers only see some
   const navItems = [
     {
-      name: "個案管理",
+      name: "服務對象管理",
       href: "/cases",
       icon: Users,
     },
@@ -51,17 +51,17 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
       icon: BarChart,
     },
     // Only show Users management for admin role
-    ...(userRole === "admin" 
+    ...(userRole === "admin"
       ? [{
-          name: "人員管理",
-          href: "/users",
-          icon: Settings,
-        }]
+        name: "人員管理",
+        href: "/users",
+        icon: Settings,
+      }]
       : [])
   ];
 
   return (
-    <nav 
+    <nav
       className={cn(
         "bg-sidebar h-screen flex flex-col py-4 transition-all duration-300 ease-in-out",
         collapsed ? "w-16" : "w-64"

@@ -80,34 +80,34 @@ const LoginForm = () => {
     }
   };
   return <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">守護樹</h1>
-        <p className="text-gray-600 mt-2">個案資料整合與洞察系統</p>
-      </div>
+    <div className="text-center mb-8">
+      <h1 className="text-2xl font-bold text-gray-800">守護樹</h1>
+      <p className="text-gray-600 mt-2">服務對象資料整合與洞察系統</p>
+    </div>
 
-      <div className="relative mb-6">
-        <div className="absolute inset-0 flex items-center">
-          <Separator className="w-full" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-muted-foreground">
-          </span>
-        </div>
+    <div className="relative mb-6">
+      <div className="absolute inset-0 flex items-center">
+        <Separator className="w-full" />
       </div>
-      
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField control={form.control} name="username" render={({
+      <div className="relative flex justify-center text-xs uppercase">
+        <span className="bg-white px-2 text-muted-foreground">
+        </span>
+      </div>
+    </div>
+
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField control={form.control} name="username" render={({
           field
         }) => <FormItem>
-                <FormLabel>使用者名稱</FormLabel>
-                <FormControl>
-                  <Input placeholder="請輸入使用者名稱" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>} />
-          
-          <FormField control={form.control} name="password" render={({
+            <FormLabel>使用者名稱</FormLabel>
+            <FormControl>
+              <Input placeholder="請輸入使用者名稱" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>} />
+
+        <FormField control={form.control} name="password" render={({
           field
         }) => <FormItem>
                 <FormLabel>密碼</FormLabel>

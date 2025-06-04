@@ -16,17 +16,17 @@ const FormFill: React.FC = () => {
   const [selectedForm, setSelectedForm] = useState("");
   const [selectedCase, setSelectedCase] = useState("");
   const [step, setStep] = useState<"select" | "fill">("select");
-  
+
   // In a real app, this would come from authentication/context
   const mockUserState = {
     name: "陳主任",
     role: "admin" as "admin" | "caregiver",
     jobTitle: "主任",
   };
-  
+
   // Get forms this user can access
   const accessibleForms = useFormPermissions(mockUserState.role, mockUserState.jobTitle);
-  
+
   // Mock cases data
   const cases = [
     { id: "case1", name: "王小明" },
@@ -34,51 +34,51 @@ const FormFill: React.FC = () => {
     { id: "case3", name: "張小華" },
     { id: "case4", name: "陳小玉" },
   ];
-  
+
   const handleStartForm = () => {
     if (!selectedForm || !selectedCase) {
       toast({
         title: "請選擇必要項目",
-        description: "請選擇個案和表單類型",
+        description: "請選擇服務對象和表單類型",
         variant: "destructive",
       });
       return;
     }
-    
+
     setStep("fill");
   };
-  
+
   const handleSubmitForm = () => {
     toast({
       title: "表單已提交",
       description: "表單已成功提交並儲存",
     });
-    
+
     setTimeout(() => {
       navigate("/forms/records");
     }, 1500);
   };
-  
+
   // Render form selection step
   const renderFormSelection = () => (
     <>
       <Card>
         <CardHeader>
           <CardTitle>選擇填寫項目</CardTitle>
-          <CardDescription>請選擇需要填寫的個案與表單類型</CardDescription>
+          <CardDescription>請選擇需要填寫的服務對象與表單類型</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">
-                選擇個案
+                選擇服務對象
               </label>
               <Select
                 value={selectedCase}
                 onValueChange={setSelectedCase}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="選擇個案" />
+                  <SelectValue placeholder="選擇服務對象" />
                 </SelectTrigger>
                 <SelectContent>
                   {cases.map((caseItem) => (
@@ -89,7 +89,7 @@ const FormFill: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">
                 選擇表單類型
@@ -111,9 +111,9 @@ const FormFill: React.FC = () => {
               </Select>
             </div>
           </div>
-          
+
           <div className="mt-6">
-            <Button 
+            <Button
               className="bg-guardian-green hover:bg-guardian-light-green"
               onClick={handleStartForm}
             >
@@ -122,14 +122,14 @@ const FormFill: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-      
+
       {selectedForm && (
         <Tabs defaultValue="details">
           <TabsList>
             <TabsTrigger value="details">表單說明</TabsTrigger>
             <TabsTrigger value="instructions">填寫指引</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="details">
             <Card>
               <CardHeader>
@@ -154,7 +154,7 @@ const FormFill: React.FC = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="instructions">
             <Card>
               <CardHeader>
@@ -174,7 +174,7 @@ const FormFill: React.FC = () => {
                     3. 與團隊成員討論，確保評估視角的一致性。
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="font-medium">填寫注意事項</h3>
                   <p className="text-sm text-gray-700">
@@ -187,7 +187,7 @@ const FormFill: React.FC = () => {
                     3. 系統會自動儲存您的填寫進度，可隨時暫停並稍後繼續。
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="font-medium">填寫後續流程</h3>
                   <p className="text-sm text-gray-700">
@@ -212,15 +212,15 @@ const FormFill: React.FC = () => {
   const renderFormFilling = () => {
     const selectedFormData = formDefinitions.find(form => form.id === selectedForm);
     const selectedCaseData = cases.find(c => c.id === selectedCase);
-    
+
     if (!selectedFormData || !selectedCaseData) return null;
 
     return (
       <div className="space-y-6">
         <div className="flex items-center space-x-2">
-          <Button 
-            variant="outline" 
-            size="icon" 
+          <Button
+            variant="outline"
+            size="icon"
             onClick={() => setStep("select")}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -229,7 +229,7 @@ const FormFill: React.FC = () => {
             填寫表單：{selectedFormData.name} - {selectedCaseData.name}
           </h2>
         </div>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>基本資料</CardTitle>
@@ -249,19 +249,19 @@ const FormFill: React.FC = () => {
                 <Input defaultValue={mockUserState.name} readOnly />
               </div>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">
                 評估備註
               </label>
-              <Textarea 
-                placeholder="請輸入本次評估的特殊狀況或其他備註事項..." 
-                className="min-h-[100px]" 
+              <Textarea
+                placeholder="請輸入本次評估的特殊狀況或其他備註事項..."
+                className="min-h-[100px]"
               />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>評估項目</CardTitle>
@@ -275,80 +275,80 @@ const FormFill: React.FC = () => {
                   <div className="space-y-4">
                     <h3 className="font-medium text-lg">認知能力</h3>
                     <div className="border rounded-lg p-4 space-y-4">
-                      <FormItem 
-                        question="1. 能夠辨識與理解基本概念（如顏色、形狀、數量）" 
-                        options={["不會", "部分會", "大部分會", "完全會"]} 
+                      <FormItem
+                        question="1. 能夠辨識與理解基本概念（如顏色、形狀、數量）"
+                        options={["不會", "部分會", "大部分會", "完全會"]}
                       />
-                      <FormItem 
-                        question="2. 能夠理解簡單的口語指令" 
-                        options={["不會", "部分會", "大部分會", "完全會"]} 
+                      <FormItem
+                        question="2. 能夠理解簡單的口語指令"
+                        options={["不會", "部分會", "大部分會", "完全會"]}
                       />
-                      <FormItem 
-                        question="3. 能夠記住日常生活中的重要資訊" 
-                        options={["不會", "部分會", "大部分會", "完全會"]} 
+                      <FormItem
+                        question="3. 能夠記住日常生活中的重要資訊"
+                        options={["不會", "部分會", "大部分會", "完全會"]}
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <h3 className="font-medium text-lg">社交互動</h3>
                     <div className="border rounded-lg p-4 space-y-4">
-                      <FormItem 
-                        question="1. 能夠適當地與他人互動" 
-                        options={["不會", "部分會", "大部分會", "完全會"]} 
+                      <FormItem
+                        question="1. 能夠適當地與他人互動"
+                        options={["不會", "部分會", "大部分會", "完全會"]}
                       />
-                      <FormItem 
-                        question="2. 能夠理解他人的情緒反應" 
-                        options={["不會", "部分會", "大部分會", "完全會"]} 
+                      <FormItem
+                        question="2. 能夠理解他人的情緒反應"
+                        options={["不會", "部分會", "大部分會", "完全會"]}
                       />
-                      <FormItem 
-                        question="3. 能夠在團體活動中參與" 
-                        options={["不會", "部分會", "大部分會", "完全會"]} 
+                      <FormItem
+                        question="3. 能夠在團體活動中參與"
+                        options={["不會", "部分會", "大部分會", "完全會"]}
                       />
                     </div>
                   </div>
                 </>
               )}
-              
+
               {selectedForm === "three-level-prevention" && (
                 <>
                   <div className="space-y-4">
                     <h3 className="font-medium text-lg">第一級預防</h3>
                     <div className="border rounded-lg p-4 space-y-4">
-                      <FormItem 
-                        question="1. 環境調整的需求程度" 
-                        options={["低度", "中度", "高度", "極高度"]} 
+                      <FormItem
+                        question="1. 環境調整的需求程度"
+                        options={["低度", "中度", "高度", "極高度"]}
                       />
-                      <FormItem 
-                        question="2. 日常作息的結構化需求" 
-                        options={["低度", "中度", "高度", "極高度"]} 
+                      <FormItem
+                        question="2. 日常作息的結構化需求"
+                        options={["低度", "中度", "高度", "極高度"]}
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <h3 className="font-medium text-lg">第二級預防</h3>
                     <div className="border rounded-lg p-4 space-y-4">
-                      <FormItem 
-                        question="1. 情緒調節的支持需求" 
-                        options={["低度", "中度", "高度", "極高度"]} 
+                      <FormItem
+                        question="1. 情緒調節的支持需求"
+                        options={["低度", "中度", "高度", "極高度"]}
                       />
-                      <FormItem 
-                        question="2. 專注力維持的支持需求" 
-                        options={["低度", "中度", "高度", "極高度"]} 
+                      <FormItem
+                        question="2. 專注力維持的支持需求"
+                        options={["低度", "中度", "高度", "極高度"]}
                       />
                     </div>
                   </div>
                 </>
               )}
-              
+
               {(selectedForm === "daily-life-function-b" || selectedForm === "aging-assessment" || selectedForm === "swallowing-difficulty") && (
                 <div className="flex items-center justify-center p-8 text-center text-gray-500">
                   <p>表單內容正在載入中，請稍後...</p>
                 </div>
               )}
             </div>
-            
+
             <div className="mt-8 flex justify-end space-x-4">
               <Button variant="outline" onClick={() => setStep("select")}>
                 返回
@@ -362,7 +362,7 @@ const FormFill: React.FC = () => {
       </div>
     );
   };
-  
+
   // Simple form item component
   const FormItem = ({ question, options }: { question: string, options: string[] }) => (
     <div className="space-y-2">
@@ -384,7 +384,7 @@ const FormFill: React.FC = () => {
         <h1 className="text-2xl font-bold tracking-tight">填寫新表單</h1>
         <p className="text-muted-foreground">選擇表單類型並填寫相關評估資料</p>
       </div>
-      
+
       {step === "select" ? renderFormSelection() : renderFormFilling()}
     </div>
   );
