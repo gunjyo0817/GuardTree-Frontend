@@ -206,6 +206,11 @@ export const apiService = {
       return api.put(`/users/me`, profileData);
     },
 
+    // Add user info update method
+    updateUserInfo: async (userId: string, userData: { name?: string; email?: string }): Promise<UserData> => {
+      return api.put(`/users/${userId}/info`, userData);
+    },
+
     // Add admin password update method
     adminUpdatePassword: async (userId: string, passwordData: { new_password: string }): Promise<void> => {
       return api.put(`/users/${userId}/admin-password`, passwordData);
