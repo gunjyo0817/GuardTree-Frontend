@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,34 +6,16 @@ import { Input } from "@/components/ui/input";
 import FormCard from "@/components/forms/FormCard";
 import { useNavigate } from "react-router-dom";
 import { formDefinitions } from "@/components/forms/FormPermissions";
+import { apiService } from "@/lib/api";
+import { FormMetadata } from "@/types/form";
 
 const FormRecords: React.FC = () => {
   const navigate = useNavigate();
   
-  // Mock form records data
-  const formRecords = [
-    {
-      id: "record1",
-      title: "王小明 - 生活功能支持評量",
-      description: "2025年第一季度評估結果",
-      category: "日常生活功能支持型態評量 – B 版",
-      updatedAt: "2025-04-28T10:30:00",
-    },
-    {
-      id: "record2",
-      title: "李小花 - 基本能力檢核表",
-      description: "入班評估",
-      category: "基本能力檢核表",
-      updatedAt: "2025-04-24T14:20:00",
-    },
-    {
-      id: "record6",
-      title: "李小花 - 基本能力檢核表",
-      description: "複評結果",
-      category: "基本能力檢核表",
-      updatedAt: "2025-04-10T13:10:00",
-    },
-  ];
+  const [records, setRecords] = React.useState<FormMetadata[]>([]);
+  React.useEffect(() => {
+    apiService.form.getAll().then(setRecords);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -72,22 +53,22 @@ const FormRecords: React.FC = () => {
           <TabsTrigger value="all">所有表單</TabsTrigger>
           {formDefinitions.map((form) => (
             <TabsTrigger key={form.id} value={form.id}>
-              {form.name}
+              {form.name.slice(13)}
             </TabsTrigger>
           ))}
         </TabsList>
         
         <TabsContent value="all" className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {formRecords.map((record) => (
+            {records.map((record) => (
               <FormCard
                 key={record.id}
-                id={record.id}
-                title={record.title}
-                description={record.description}
-                category={record.category}
-                updatedAt={record.updatedAt}
+                id={record.id.toString()}
+                title={`${record.case_name || ""}`}
+                description={`${formDefinitions.find(f => f.id === record.form_type)?.name}`}
+                createdAt={record.created_at}
                 type="record"
+                onClick={() => navigate(`/forms/records/${record.id}`)}
               />
             ))}
           </div>
@@ -96,17 +77,17 @@ const FormRecords: React.FC = () => {
         {formDefinitions.map((form) => (
           <TabsContent key={form.id} value={form.id} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {formRecords
-                .filter((record) => record.category === form.name)
+              {records
+                .filter((record) => record.form_type === form.id)
                 .map((record) => (
                   <FormCard
                     key={record.id}
-                    id={record.id}
-                    title={record.title}
-                    description={record.description}
-                    category={record.category}
-                    updatedAt={record.updatedAt}
+                    id={record.id.toString()}
+                    title={`${record.case_name || ""}`}
+                    description={`${formDefinitions.find(f => f.id === record.form_type)?.name}`}
+                    createdAt={record.created_at}
                     type="record"
+                    onClick={() => navigate(`/forms/records/${record.id}`)}
                   />
                 ))}
             </div>
