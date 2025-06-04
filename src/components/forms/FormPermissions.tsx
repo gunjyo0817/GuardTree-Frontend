@@ -9,13 +9,13 @@ export interface FormDefinition {
 }
 
 export const formDefinitions: FormDefinition[] = [
-  { id: "form_A", name: "日常生活功能支持型態評量：A. 居家活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
-  { id: "form_B", name: "日常生活功能支持型態評量：B.社區生活活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
-  { id: "form_C", name: "日常生活功能支持型態評量：C.終身學習", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
-  { id: "form_D", name: "日常生活功能支持型態評量：D.作業活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
-  { id: "form_E", name: "日常生活功能支持型態評量：E.健康與安全活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
-  { id: "form_F", name: "日常生活功能支持型態評量：F.社交活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
-  { id: "form_G", name: "日常生活功能支持型態評量：G.保護與倡議活動（P&A）", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
+  { id: "A", name: "日常生活功能支持型態評量：A. 居家活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
+  { id: "B", name: "日常生活功能支持型態評量：B.社區生活活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
+  { id: "C", name: "日常生活功能支持型態評量：C.終身學習", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
+  { id: "D", name: "日常生活功能支持型態評量：D.作業活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
+  { id: "E", name: "日常生活功能支持型態評量：E.健康與安全活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
+  { id: "F", name: "日常生活功能支持型態評量：F.社交活動", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
+  { id: "G", name: "日常生活功能支持型態評量：G.保護與倡議活動（P&A）", description: "", allowedRoles: ["admin"], allowedJobTitles: ["教保員"] },
 ];
 
 export const useFormPermissions = (
