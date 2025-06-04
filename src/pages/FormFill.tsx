@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formDefinitions, useFormPermissions } from "@/components/forms/FormPermissions";
+import { formDefinitions } from "@/components/forms/FormPermissions";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
@@ -11,6 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { apiService } from "@/lib/api";
 import formData from "@/data/form.json";
+
+function makeKey(q: any) {
+  return [q.activity, q.item, q.subitem].join("|");
+}
 
 const supportOptions = [
   { value: 4, label: "4 - 完全肢體協助" },
@@ -28,16 +32,10 @@ const FormFill: React.FC = () => {
   const [step, setStep] = useState<"select" | "fill">("select");
   const [cases, setCases] = useState<{ id: number, name: string }[]>([]);
   const [loadingCases, setLoadingCases] = useState(true);
-
-  // In a real app, this would come from authentication/context
-  const mockUserState = {
-    name: "陳主任",
-    role: "admin" as "admin" | "caregiver",
-    jobTitle: "主任",
-  };
-
-  // Get forms this user can access
-  const accessibleForms = useFormPermissions(mockUserState.role, mockUserState.jobTitle);
+  const [answers, setAnswers] = useState<Record<string, number | null>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [showErrors, setShowErrors] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id: string, name: string } | null>(null);
 
   useEffect(() => {
     const fetchCases = async () => {
@@ -46,6 +44,10 @@ const FormFill: React.FC = () => {
       setLoadingCases(false);
     };
     fetchCases();
+  }, []);
+
+  useEffect(() => {
+    apiService.users.getCurrentUser().then(user => setCurrentUser(user));
   }, []);
 
   const handleStartForm = () => {
@@ -61,15 +63,87 @@ const FormFill: React.FC = () => {
     setStep("fill");
   };
 
-  const handleSubmitForm = () => {
-    toast({
-      title: "表單已提交",
-      description: "表單已成功提交並儲存",
-    });
+  const handleSubmitForm = async () => {
+    const questions = formData[selectedForm] || [];
+    const missing = questions
+      .map(q => makeKey(q))
+      .filter(key => answers[key] == null);
+    if (missing.length > 0) {
+      setShowErrors(true);
+      toast({
+        title: "有尚未填寫的欄位",
+        description: "請完成所有題目",
+        variant: "destructive",
+      });
+      setTouched(t => {
+        const newTouched = { ...t };
+        missing.forEach(q => { newTouched[q] = true; });
+        return newTouched;
+      });
+      return;
+    }
+    setShowErrors(false);
 
-    setTimeout(() => {
-      navigate("/forms/records");
-    }, 1500);
+    const year = new Date().getFullYear();
+    const existingForms = await apiService.form.getByCaseId(selectedCase);
+    const existing = existingForms.find(f => new Date(f.created_at).getFullYear() === year);
+
+    // 你選的那一張表的 key
+    const formKey = `${selectedForm}`;
+    // 你選的那一張表的題目
+    const newItems = formData[selectedForm].map(q => ({
+      activity: q.activity,
+      item: q.item,
+      subitem: q.subitem,
+      core_area: q.core_area,
+      support_type: answers[makeKey(q)],
+    }));
+
+    let payload;
+    if (existing) {
+      const fullRecord = await apiService.form.getById(existing.id);
+      payload = {
+        year,
+        form_A: formKey === "form_A" ? newItems : fullRecord.form_A,
+        form_B: formKey === "form_B" ? newItems : fullRecord.form_B,
+        form_C: formKey === "form_C" ? newItems : fullRecord.form_C,
+        form_D: formKey === "form_D" ? newItems : fullRecord.form_D,
+        form_E: formKey === "form_E" ? newItems : fullRecord.form_E,
+        form_F: formKey === "form_F" ? newItems : fullRecord.form_F,
+        form_G: formKey === "form_G" ? newItems : fullRecord.form_G,
+      };
+      await apiService.form.update(existing.id, payload);
+    } else {
+      if (!currentUser) {
+        toast({ title: "請先登入" });
+        return;
+      }
+      payload = {
+        case_id: Number(selectedCase),
+        user_id: currentUser.id,
+        year,
+        form_A: formKey === "form_A" ? newItems : [],
+        form_B: formKey === "form_B" ? newItems : [],
+        form_C: formKey === "form_C" ? newItems : [],
+        form_D: formKey === "form_D" ? newItems : [],
+        form_E: formKey === "form_E" ? newItems : [],
+        form_F: formKey === "form_F" ? newItems : [],
+        form_G: formKey === "form_G" ? newItems : [],
+      };
+      await apiService.form.create(payload);
+    }
+
+    try {
+      toast({
+        title: "表單已提交",
+        description: "表單已成功提交並儲存",
+      });
+      setTimeout(() => {
+        navigate("/forms/records");
+      }, 1500);
+    } catch (err: any) {
+      toast({ title: "送出失敗", description: err?.response?.data?.detail || "請稍後再試", variant: "destructive" });
+    }
   };
 
   // Render form selection step
@@ -118,7 +192,7 @@ const FormFill: React.FC = () => {
                   <SelectValue placeholder="選擇表單類型" />
                 </SelectTrigger>
                 <SelectContent>
-                  {accessibleForms.map((form) => (
+                  {formDefinitions.map((form) => (
                     <SelectItem key={form.id} value={form.id}>
                       {form.name}
                     </SelectItem>
@@ -233,14 +307,21 @@ const FormFill: React.FC = () => {
 
     // 這裡載入對應的題目
     const questions = formData[selectedForm] || [];
+    const missing = questions
+      .map(q => makeKey(q))
+      .filter(key => answers[key] == null);
 
     // group by activity > item
     const grouped = questions.reduce((acc, q) => {
       if (!acc[q.activity]) acc[q.activity] = {};
-      if (!acc[q.activity][q.item]) acc[q.activity][q.item] = [];
-      acc[q.activity][q.item].push(q.subitem);
+      if (q.subitem) {
+        if (!acc[q.activity][q.item]) acc[q.activity][q.item] = [];
+        acc[q.activity][q.item].push(q);
+      } else {
+        acc[q.activity][q.item] = q;
+      }
       return acc;
-    }, {} as Record<string, Record<string, (string | null)[]>>);
+    }, {} as Record<string, Record<string, any>>);
 
     return (
       <div className="space-y-6">
@@ -273,7 +354,7 @@ const FormFill: React.FC = () => {
                 <label className="text-sm font-medium text-gray-700 block mb-1">
                   填表人員
                 </label>
-                <Input defaultValue={mockUserState.name} readOnly />
+                <Input defaultValue={currentUser?.name || ""} readOnly />
               </div>
             </div>
 
@@ -299,22 +380,39 @@ const FormFill: React.FC = () => {
               <div key={activity} className="mb-10 border rounded-lg p-6 bg-gray-50">
                 <h3 className="font-semibold text-lg mb-4">{activity}</h3>
                 <div>
-                  {Object.entries(items).map(([item, subitems]) => {
-                    const hasSubitem = subitems.some(Boolean);
-                    return (
-                      <div key={item} className="mb-6">
-                        {hasSubitem && <div className="font-medium mb-3 mt-4">{item}</div>}
-                        <div>
-                          {hasSubitem
-                            ? subitems.map((subitem, idx) =>
-                                subitem
-                                  ? <FormItem key={idx} question={subitem} className="mb-5" />
-                                  : null
-                              )
-                            : <FormItem question={item} className="mb-5" />}
+                  {Object.entries(items).map(([item, value]) => {
+                    if (Array.isArray(value)) {
+                      // 有 subitem
+                      return (
+                        <div key={item} className="mb-6">
+                          <div className="font-medium mb-3 mt-4">{item}</div>
+                          <div>
+                            {value.map((q, idx) => (
+                              <FormItem
+                                key={idx}
+                                question={makeKey(q)}
+                                label={q.subitem}
+                                className="mb-5"
+                                error={showErrors && answers[makeKey(q)] == null}
+                              />
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    );
+                      );
+                    } else {
+                      // 沒 subitem
+                      const q = value;
+                      return (
+                        <div key={item} className="mb-6">
+                          <FormItem
+                            question={makeKey(q)}
+                            label={q.item}
+                            className="mb-5"
+                            error={showErrors && answers[makeKey(q)] == null}
+                          />
+                        </div>
+                      );
+                    }
                   })}
                 </div>
               </div>
@@ -334,13 +432,22 @@ const FormFill: React.FC = () => {
     );
   };
 
-  const FormItem = ({ question, className = "" }: { question: string, className?: string }) => (
+  const FormItem = ({ question, label, className = "", error }) => (
     <div className={`space-y-2 ${className}`}>
-      <p className="font-medium">{question}</p>
-      <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
+      <p className="font-medium">{label}</p>
+      <div className={`grid grid-cols-2 sm:grid-cols-6 gap-4 ${error ? "border border-red-500 rounded" : ""}`}>
         {supportOptions.map((option) => (
           <label key={option.value} className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer text-xs">
-            <input type="radio" name={`q-${question.slice(0, 10)}`} value={option.value} className="accent-guardian-green" />
+            <input
+              type="radio"
+              name={`q-${question}`}
+              value={option.value}
+              checked={answers[question] === option.value}
+              onChange={() => {
+                setAnswers(a => ({ ...a, [question]: option.value }));
+                setTouched(t => ({ ...t, [question]: true }));
+              }}
+            />
             <span>{option.label}</span>
           </label>
         ))}

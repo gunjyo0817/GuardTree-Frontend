@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { Case, CaseCreate, CaseUpdate } from '@/types/case';
+import { FormMetadata, FormRecord, FormRecordCreate, FormRecordResponse, FormRecordUpdate } from '@/types/form';
 
 interface AuthResponse {
   access_token: string;
@@ -231,6 +232,21 @@ export const apiService = {
 
     delete: async (caseId: string): Promise<unknown> => {
       return api.delete(`/cases/${caseId}`);
+    },
+  },
+
+  form: {
+    getByCaseId: async (caseId: string): Promise<FormMetadata[]> => {
+      return api.get(`/forms/case/${caseId}`);
+    },
+    create: async (data: FormRecordCreate): Promise<FormRecord> => {
+      return api.post('/forms/', data);
+    },
+    update: async (formId: number, data: FormRecordUpdate): Promise<FormRecordResponse> => {
+      return api.put(`/forms/${formId}`, data);
+    },
+    getById: async (formId: number): Promise<FormRecord> => {
+      return api.get(`/forms/${formId}`);
     },
   }
 };
