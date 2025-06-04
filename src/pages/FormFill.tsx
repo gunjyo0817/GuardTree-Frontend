@@ -100,38 +100,18 @@ const FormFill: React.FC = () => {
     }));
 
     let payload;
-    if (existing) {
-      const fullRecord = await apiService.form.getById(existing.id);
-      payload = {
-        year,
-        form_A: formKey === "form_A" ? newItems : fullRecord.form_A,
-        form_B: formKey === "form_B" ? newItems : fullRecord.form_B,
-        form_C: formKey === "form_C" ? newItems : fullRecord.form_C,
-        form_D: formKey === "form_D" ? newItems : fullRecord.form_D,
-        form_E: formKey === "form_E" ? newItems : fullRecord.form_E,
-        form_F: formKey === "form_F" ? newItems : fullRecord.form_F,
-        form_G: formKey === "form_G" ? newItems : fullRecord.form_G,
-      };
-      await apiService.form.update(existing.id, payload);
-    } else {
-      if (!currentUser) {
-        toast({ title: "請先登入" });
-        return;
-      }
-      payload = {
-        case_id: Number(selectedCase),
-        user_id: currentUser.id,
-        year,
-        form_A: formKey === "form_A" ? newItems : [],
-        form_B: formKey === "form_B" ? newItems : [],
-        form_C: formKey === "form_C" ? newItems : [],
-        form_D: formKey === "form_D" ? newItems : [],
-        form_E: formKey === "form_E" ? newItems : [],
-        form_F: formKey === "form_F" ? newItems : [],
-        form_G: formKey === "form_G" ? newItems : [],
-      };
-      await apiService.form.create(payload);
+    if (!currentUser) {
+      toast({ title: "請先登入" });
+      return;
     }
+    payload = {
+      case_id: Number(selectedCase),
+      user_id: currentUser.id,
+      year,
+      form_type: formKey,
+      content: newItems,
+    };
+    await apiService.form.create(payload);
 
     try {
       toast({
