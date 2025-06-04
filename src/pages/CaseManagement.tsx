@@ -151,6 +151,7 @@ function CaseForm({ setCases, setShowNewCaseForm }: { setCases: React.Dispatch<R
 const CaseManagement: React.FC = () => {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [showNewCaseForm, setShowNewCaseForm] = useState(false);
 
@@ -168,11 +169,9 @@ const CaseManagement: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, you would save the new case data
-    setShowNewCaseForm(false);
-  };
+  const filteredCases = cases.filter((caseItem) =>
+    caseItem.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -184,7 +183,13 @@ const CaseManagement: React.FC = () => {
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative w-full sm:w-auto">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="搜尋個案..." className="w-full sm:w-[200px] pl-8" />
+            <Input
+              type="search"
+              placeholder="搜尋個案..."
+              className="w-full sm:w-[200px] pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <Button onClick={() => setShowNewCaseForm(true)}>
             <UserPlus className="h-4 w-4 mr-1.5" />
@@ -215,29 +220,11 @@ const CaseManagement: React.FC = () => {
           </div>
 
           <TabsContent value="all" className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {cases.map(caseItem => (
-                <CaseCard
-                  key={caseItem.id}
-                  id={caseItem.id}
-                  name={caseItem.name}
-                  birthdate={caseItem.birthdate}
-                  caseDescription={caseItem.caseDescription}
-                  gender={caseItem.gender}
-                  types={caseItem.types}
-                  formsCount={99}
-                  updated_at={caseItem.updated_at}
-                  onClick={() => console.log(`查看個案：${caseItem.name}`)}
-                />
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="recent" className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {[...cases]
-                .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
-                .map(caseItem => (
+            {filteredCases.length === 0 ? (
+              <p className="text-muted-foreground px-2">查無符合的個案</p>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {filteredCases.map(caseItem => (
                   <CaseCard
                     key={caseItem.id}
                     id={caseItem.id}
@@ -250,9 +237,36 @@ const CaseManagement: React.FC = () => {
                     updated_at={caseItem.updated_at}
                     onClick={() => console.log(`查看個案：${caseItem.name}`)}
                   />
-                ))
-              }
-            </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="recent" className="space-y-4">
+            {filteredCases.length === 0 ? (
+              <p className="text-muted-foreground px-2">查無符合的個案</p>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {
+                  [...filteredCases]
+                    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+                    .map(caseItem => (
+                      <CaseCard
+                        key={caseItem.id}
+                        id={caseItem.id}
+                        name={caseItem.name}
+                        birthdate={caseItem.birthdate}
+                        caseDescription={caseItem.caseDescription}
+                        gender={caseItem.gender}
+                        types={caseItem.types}
+                        formsCount={99}
+                        updated_at={caseItem.updated_at}
+                        onClick={() => console.log(`查看個案：${caseItem.name}`)}
+                      />
+                    ))
+                }
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       )}
