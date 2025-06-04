@@ -14,6 +14,7 @@ const FormRecords: React.FC = () => {
   const [records, setRecords] = React.useState<FormMetadata[]>([]);
   const [search, setSearch] = React.useState("");
   const [year, setYear] = React.useState<string>("");
+  const [activeTab, setActiveTab] = React.useState("all");
 
   React.useEffect(() => {
     apiService.form.getAll().then(setRecords);
@@ -80,7 +81,7 @@ const FormRecords: React.FC = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="all" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="w-full sm:w-auto">
           <TabsTrigger value="all">所有表單</TabsTrigger>
           {formDefinitions.map((form) => (
