@@ -4,6 +4,7 @@ import { apiService } from "@/lib/api";
 import { FormRecordResponse } from "@/types/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { formDefinitions } from "@/components/forms/FormPermissions";
 
 const supportLabel = {
   4: "4 - 完全肢體協助",
@@ -70,7 +71,7 @@ const FormRecordDetail: React.FC = () => {
             <div className="text-gray-500">建立時間</div>
             <div>{new Date(record.created_at).toLocaleString("zh-TW")}</div>
             <div className="text-gray-500">表單類型</div>
-            <div>{record.form_type}</div>
+            <div>{formDefinitions.find(f => f.id === record.form_type)?.name || record.form_type}</div>
           </div>
         </CardContent>
       </Card>
