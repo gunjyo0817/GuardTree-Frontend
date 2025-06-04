@@ -12,12 +12,16 @@ import { FormMetadata } from "@/types/form";
 const FormRecords: React.FC = () => {
   const navigate = useNavigate();
   const [records, setRecords] = React.useState<FormMetadata[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [search, setSearch] = React.useState("");
   const [year, setYear] = React.useState<string>("");
   const [activeTab, setActiveTab] = React.useState("all");
 
   React.useEffect(() => {
-    apiService.form.getAll().then(setRecords);
+    apiService.form.getAll().then(data => {
+      setRecords(data);
+      setLoading(false);
+    });
   }, []);
 
   // get all years
@@ -77,52 +81,56 @@ const FormRecords: React.FC = () => {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="all">所有表單</TabsTrigger>
-          {formDefinitions.map((form) => (
-            <TabsTrigger key={form.id} value={form.id}>
-              {form.name.slice(13)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        
-        <TabsContent value="all" className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredRecords.map((record) => (
-              <FormCard
-                key={record.id}
-                id={record.id.toString()}
-                title={`${record.case_name || ""}`}
-                description={`${formDefinitions.find(f => f.id === record.form_type)?.name}`}
-                createdAt={record.created_at}
-                type="record"
-                onClick={() => navigate(`/forms/records/${record.id}`)}
-              />
+      {loading ? (
+        <div className="text-center text-gray-400 py-10">載入中...</div>
+      ) : (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="all">所有表單</TabsTrigger>
+            {formDefinitions.map((form) => (
+              <TabsTrigger key={form.id} value={form.id}>
+                {form.name.slice(13)}
+              </TabsTrigger>
             ))}
-          </div>
-        </TabsContent>
-        
-        {formDefinitions.map((form) => (
-          <TabsContent key={form.id} value={form.id} className="space-y-4">
+          </TabsList>
+          
+          <TabsContent value="all" className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredRecords
-                .filter((record) => record.form_type === form.id)
-                .map((record) => (
-                  <FormCard
-                    key={record.id}
-                    id={record.id.toString()}
-                    title={`${record.case_name || ""}`}
-                    description={`${formDefinitions.find(f => f.id === record.form_type)?.name}`}
-                    createdAt={record.created_at}
-                    type="record"
-                    onClick={() => navigate(`/forms/records/${record.id}`)}
-                  />
-                ))}
+              {filteredRecords.map((record) => (
+                <FormCard
+                  key={record.id}
+                  id={record.id.toString()}
+                  title={`${record.case_name || ""}`}
+                  description={`${formDefinitions.find(f => f.id === record.form_type)?.name}`}
+                  createdAt={record.created_at}
+                  type="record"
+                  onClick={() => navigate(`/forms/records/${record.id}`)}
+                />
+              ))}
             </div>
           </TabsContent>
-        ))}
-      </Tabs>
+          
+          {formDefinitions.map((form) => (
+            <TabsContent key={form.id} value={form.id} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredRecords
+                  .filter((record) => record.form_type === form.id)
+                  .map((record) => (
+                    <FormCard
+                      key={record.id}
+                      id={record.id.toString()}
+                      title={`${record.case_name || ""}`}
+                      description={`${formDefinitions.find(f => f.id === record.form_type)?.name}`}
+                      createdAt={record.created_at}
+                      type="record"
+                      onClick={() => navigate(`/forms/records/${record.id}`)}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
     </div>
   );
 };
