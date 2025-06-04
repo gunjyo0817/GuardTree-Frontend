@@ -26,6 +26,7 @@ const Analysis: React.FC = () => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [hasExistingAnalysis, setHasExistingAnalysis] = useState<boolean>(false);
   const formOptions = [
     { value: "form_A", label: "居家活動" },
@@ -37,21 +38,6 @@ const Analysis: React.FC = () => {
     { value: "form_G", label: "保護與倡議活動" },
   ];
   
-
-  // const handleGenerateAnalysis = async () => {
-  //   const res = await fetch("/api/analysis", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       case_id: selectedCase,
-  //       form_type: selectedForm,
-  //       filled_date: selectedDate,
-  //     }),
-  //   });
-  //   const data = await res.json();
-  //   setAnalysisResult(data);
-  // };
-
   useEffect(() => {
     const fetchCases = async () => {
       const data = await apiService.cases.getAll();
@@ -85,6 +71,14 @@ const Analysis: React.FC = () => {
       setHasExistingAnalysis(true);
     } catch (e: any) {
       setError(typeof e === "string" ? e : e?.message || "分析失敗");
+      let message = "發生未知錯誤";
+      if (e.response) {
+        message = e.response.data.detail || "伺服器錯誤";
+        if (message == "Form not found") {
+          message = "找不到指定的表單";
+        }
+      }
+      setErrorMessage(message);
     } finally {
       setIsLoading(false);
     }
@@ -163,14 +157,14 @@ const Analysis: React.FC = () => {
           ) : (
             <Sparkles className="h-4 w-4 mr-1.5" />
           )}
-          {isLoading ? "分析中..." : hasExistingAnalysis ? "重新分析" : "生成分析"}
+          {isLoading ? "分析中..." : "查看分析結果"}
         </Button>
       </div>
 
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{errorMessage}</AlertDescription>
         </Alert>
       )}
 
