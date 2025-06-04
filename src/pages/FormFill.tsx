@@ -28,8 +28,6 @@ const FormFill: React.FC = () => {
   const [step, setStep] = useState<"select" | "fill">("select");
   const [cases, setCases] = useState<{ id: number, name: string }[]>([]);
   const [loadingCases, setLoadingCases] = useState(true);
-  const [answers, setAnswers] = useState<Record<string, string | number>>({});
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
 
   // In a real app, this would come from authentication/context
   const mockUserState = {
@@ -63,58 +61,15 @@ const FormFill: React.FC = () => {
     setStep("fill");
   };
 
-  const handleSubmitForm = async () => {
-    // 取得所有題目 key
-    const allQuestions = [];
-    Object.values(grouped).forEach(items =>
-      Object.values(items).forEach(subitems => {
-        const hasSubitem = subitems.some(Boolean);
-        if (hasSubitem) {
-          subitems.forEach(subitem => {
-            if (subitem) allQuestions.push(subitem);
-          });
-        } else {
-          allQuestions.push(Object.keys(items)[0]);
-        }
-      })
-    );
-
-    // 檢查未填
-    const newErrors: Record<string, boolean> = {};
-    allQuestions.forEach(q => {
-      if (answers[q] === undefined || answers[q] === "") newErrors[q] = true;
+  const handleSubmitForm = () => {
+    toast({
+      title: "表單已提交",
+      description: "表單已成功提交並儲存",
     });
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      toast({
-        title: "有尚未填寫的欄位",
-        description: "請完成所有必填欄位",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // 4. API: 先查 case 下有沒有這個 form
-    const caseForms = await apiService.forms.getByCaseId(selectedCase);
-    const exist = caseForms.find(f => f.form_id === selectedForm);
-
-    const payload = {
-      case_id: selectedCase,
-      form_id: selectedForm,
-      answers, // 你要根據後端 schema調整
-      // 其他欄位...
-    };
-
-    if (exist) {
-      await apiService.forms.update(exist.id, payload);
-      toast({ title: "表單已更新", description: "資料已儲存" });
-    } else {
-      await apiService.forms.create(payload);
-      toast({ title: "表單已建立", description: "資料已儲存" });
-    }
-
-    navigate("/forms/records");
+    setTimeout(() => {
+      navigate("/forms/records");
+    }, 1500);
   };
 
   // Render form selection step
@@ -380,27 +335,13 @@ const FormFill: React.FC = () => {
   };
 
   const FormItem = ({ question, className = "" }: { question: string, className?: string }) => (
-    <div className={`flex items-center gap-6 ${className}`}>
-      <span className="font-medium min-w-[120px]">{question}</span>
-      <div className="grid grid-cols-6 gap-4 max-w-xl">
+    <div className={`space-y-2 ${className}`}>
+      <p className="font-medium">{question}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
         {supportOptions.map((option) => (
-          <label
-            key={option.value}
-            className={`flex flex-col items-center cursor-pointer whitespace-nowrap min-w-[90px] 
-              ${errors[question] ? "border border-red-500 rounded" : ""}`}
-          >
-            <input
-              type="radio"
-              name={question}
-              value={option.value}
-              checked={answers[question] == option.value}
-              onChange={() => {
-                setAnswers(a => ({ ...a, [question]: option.value }));
-                setErrors(e => ({ ...e, [question]: false }));
-              }}
-              className="accent-guardian-green"
-            />
-            <span className="font-bold text-xs">{option.value}</span>
+          <label key={option.value} className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer text-xs">
+            <input type="radio" name={`q-${question.slice(0, 10)}`} value={option.value} className="accent-guardian-green" />
+            <span>{option.label}</span>
           </label>
         ))}
       </div>
