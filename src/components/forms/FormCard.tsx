@@ -99,9 +99,6 @@ const FormCard: React.FC<FormCardProps> = ({
             <Button variant="ghost" size="sm" onClick={onClick}>
               <Eye className="h-4 w-4 mr-1" /> 查看
             </Button>
-            <Button variant="ghost" size="sm" onClick={onClick}>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
           </>
         )}
       </CardFooter>

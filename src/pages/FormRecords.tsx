@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, Plus } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import FormCard from "@/components/forms/FormCard";
 import { useNavigate } from "react-router-dom";
@@ -74,10 +74,6 @@ const FormRecords: React.FC = () => {
               <option key={y} value={y}>{y}</option>
             ))}
           </select>
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-1.5" />
-            篩選
-          </Button>
         </div>
       </div>
 
