@@ -10,6 +10,8 @@ import { toast } from "sonner";
 // Change from Google to a valid icon that can represent Google
 import { ArrowRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+// 導入 API 服務
+import apiService from "@/lib/api";
 
 // Define form schema with Zod
 const formSchema = z.object({
@@ -23,7 +25,6 @@ const formSchema = z.object({
 const LoginForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   // Initialize the form with react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -38,39 +39,23 @@ const LoginForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Mock authentication (in a real app, this would be an API call)
-      if (values.username === "admin" && values.password === "admin") {
-        toast.success("登入成功");
-        navigate("/cases");
-      } else if (values.username === "caregiver" && values.password === "caregiver") {
+      // 使用 API 服務進行登錄請求
+      const response = await apiService.auth.login(values.username, values.password);
+      
+      // 存儲返回的令牌
+      if (response.access_token) {
+        localStorage.setItem('authToken', response.access_token);
         toast.success("登入成功");
         navigate("/cases");
       } else {
-        toast.error("使用者名稱或密碼不正確");
+        toast.error("登入失敗，請檢查您的使用者名稱和密碼");
+        console.error("Login error:", response);
       }
     } catch (error) {
-      toast.error("登入失敗，請稍後再試");
+      toast.error("登入失敗，請檢查您的使用者名稱和密碼");
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
-    }
-  };
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    try {
-      // In a real app, this would redirect to Google OAuth
-      // For now, we'll simulate the process
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success("Google 登入成功");
-      navigate("/cases");
-    } catch (error) {
-      toast.error("Google 登入失敗");
-      console.error("Google login error:", error);
-    } finally {
-      setIsGoogleLoading(false);
     }
   };
   return <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
@@ -78,17 +63,6 @@ const LoginForm = () => {
         <h1 className="text-2xl font-bold text-gray-800">守護樹</h1>
         <p className="text-gray-600 mt-2">個案資料整合與洞察系統</p>
       </div>
-      
-      <Button variant="outline" type="button" disabled={isGoogleLoading} onClick={handleGoogleLogin} className="w-full mb-6">
-        {isGoogleLoading ? <span className="flex items-center justify-center">
-            <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-            登入中...
-          </span> : <span className="flex items-center justify-center">
-            {/* Use the replacement icon */}
-            <span className="bg-white rounded-full flex items-center justify-center mr-2 text-red-500">G</span>
-            使用 Google 登入
-          </span>}
-      </Button>
 
       <div className="relative mb-6">
         <div className="absolute inset-0 flex items-center">
@@ -96,7 +70,6 @@ const LoginForm = () => {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-white px-2 text-muted-foreground">
-            或使用系統帳號
           </span>
         </div>
       </div>
@@ -138,12 +111,6 @@ const LoginForm = () => {
           <Button type="submit" className="w-full bg-guardian-green hover:bg-guardian-light-green" disabled={isLoading}>
             {isLoading ? "登入中..." : "登入"}
           </Button>
-          
-          <div className="text-center text-sm text-gray-500 mt-4">
-            <p>測試帳號:</p>
-            <p>管理員: admin / admin</p>
-            <p>教保員: caregiver / caregiver</p>
-          </div>
         </form>
       </Form>
     </div>;
