@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import CaseCard from "@/components/dashboard/CaseCard";
+import CaseDetailPanel from "@/components/cases/CaseDetailPanel";
 
 import { Case } from "@/types/case";
 import { apiService } from "@/lib/api";
@@ -152,8 +153,9 @@ const CaseManagement: React.FC = () => {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [showNewCaseForm, setShowNewCaseForm] = useState(false);
+  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
+  const [isDetailPanelOpen, setIsDetailPanelOpen] = useState(false);
 
   useEffect(() => {
     const fetchCases = async () => {
@@ -164,6 +166,19 @@ const CaseManagement: React.FC = () => {
     };
     fetchCases();
   }, []);
+
+  const handleCaseClick = (caseItem: Case) => {
+    setSelectedCase(caseItem);
+    setIsDetailPanelOpen(true);
+  };
+
+  const handleCaseUpdate = (updatedCase: Case) => {
+    setCases(prev => prev.map(c => c.id === updatedCase.id ? updatedCase : c));
+  };
+
+  const handleCaseDelete = (caseId: number) => {
+    setCases(prev => prev.filter(c => c.id !== caseId));
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -235,7 +250,7 @@ const CaseManagement: React.FC = () => {
                     types={caseItem.types}
                     formsCount={99}
                     updated_at={caseItem.updated_at}
-                    onClick={() => console.log(`查看服務對象：${caseItem.name}`)}
+                    onClick={() => handleCaseClick(caseItem)}
                   />
                 ))}
               </div>
@@ -261,7 +276,7 @@ const CaseManagement: React.FC = () => {
                         types={caseItem.types}
                         formsCount={99}
                         updated_at={caseItem.updated_at}
-                        onClick={() => console.log(`查看服務對象：${caseItem.name}`)}
+                        onClick={() => handleCaseClick(caseItem)}
                       />
                     ))
                 }
@@ -270,6 +285,14 @@ const CaseManagement: React.FC = () => {
           </TabsContent>
         </Tabs>
       )}
+
+      <CaseDetailPanel
+        isOpen={isDetailPanelOpen}
+        onClose={() => setIsDetailPanelOpen(false)}
+        case={selectedCase}
+        onUpdate={handleCaseUpdate}
+        onDelete={handleCaseDelete}
+      />
     </div>
   );
 };
