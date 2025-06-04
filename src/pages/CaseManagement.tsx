@@ -142,7 +142,7 @@ function CaseForm({ setCases, setShowNewCaseForm }: { setCases: React.Dispatch<R
       </div>
 
       <div className="pt-4">
-        <Button type="submit">新增個案</Button>
+        <Button type="submit">新增服務對象</Button>
       </div>
     </form>
   );
@@ -177,15 +177,15 @@ const CaseManagement: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">個案管理</h1>
-          <p className="text-muted-foreground">管理所有個案資料</p>
+          <h1 className="text-2xl font-bold tracking-tight">服務對象管理</h1>
+          <p className="text-muted-foreground">管理所有服務對象資料</p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative w-full sm:w-auto">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="搜尋個案..."
+              placeholder="搜尋服務對象..."
               className="w-full sm:w-[200px] pl-8"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -193,7 +193,7 @@ const CaseManagement: React.FC = () => {
           </div>
           <Button onClick={() => setShowNewCaseForm(true)}>
             <UserPlus className="h-4 w-4 mr-1.5" />
-            新增個案
+            新增服務對象
           </Button>
         </div>
       </div>
@@ -201,7 +201,7 @@ const CaseManagement: React.FC = () => {
       {showNewCaseForm ? (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>新增個案</CardTitle>
+            <CardTitle>新增服務對象</CardTitle>
             <Button variant="ghost" size="icon" onClick={() => setShowNewCaseForm(false)}>
               <X className="h-4 w-4" />
             </Button>
@@ -214,14 +214,14 @@ const CaseManagement: React.FC = () => {
         <Tabs defaultValue="all" className="space-y-4">
           <div className="flex justify-between items-center">
             <TabsList>
-              <TabsTrigger value="all">所有個案</TabsTrigger>
+              <TabsTrigger value="all">所有服務對象</TabsTrigger>
               <TabsTrigger value="recent">最近更新</TabsTrigger>
             </TabsList>
           </div>
 
           <TabsContent value="all" className="space-y-4">
             {filteredCases.length === 0 ? (
-              <p className="text-muted-foreground px-2">查無符合的個案</p>
+              <p className="text-muted-foreground px-2">查無符合的服務對象</p>
             ) : (
               <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {filteredCases.map(caseItem => (
@@ -235,7 +235,7 @@ const CaseManagement: React.FC = () => {
                     types={caseItem.types}
                     formsCount={99}
                     updated_at={caseItem.updated_at}
-                    onClick={() => console.log(`查看個案：${caseItem.name}`)}
+                    onClick={() => console.log(`查看服務對象：${caseItem.name}`)}
                   />
                 ))}
               </div>
@@ -244,7 +244,7 @@ const CaseManagement: React.FC = () => {
 
           <TabsContent value="recent" className="space-y-4">
             {filteredCases.length === 0 ? (
-              <p className="text-muted-foreground px-2">查無符合的個案</p>
+              <p className="text-muted-foreground px-2">查無符合的服務對象</p>
             ) : (
               <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {
@@ -261,7 +261,7 @@ const CaseManagement: React.FC = () => {
                         types={caseItem.types}
                         formsCount={99}
                         updated_at={caseItem.updated_at}
-                        onClick={() => console.log(`查看個案：${caseItem.name}`)}
+                        onClick={() => console.log(`查看服務對象：${caseItem.name}`)}
                       />
                     ))
                 }

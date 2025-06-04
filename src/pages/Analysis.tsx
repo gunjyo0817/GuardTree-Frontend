@@ -8,12 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const Analysis: React.FC = () => {
   const [selectedDates] = useState([
     "2023-05-15",
-    "2023-06-22", 
-    "2023-08-10", 
-    "2023-09-05", 
-    "2023-11-17", 
-    "2024-01-23", 
-    "2024-03-08", 
+    "2023-06-22",
+    "2023-08-10",
+    "2023-09-05",
+    "2023-11-17",
+    "2024-01-23",
+    "2024-03-08",
     "2024-04-12"
   ]);
 
@@ -22,7 +22,7 @@ const Analysis: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">智慧分析</h1>
-          <p className="text-muted-foreground">AI 輔助分析個案評估數據與趨勢</p>
+          <p className="text-muted-foreground">AI 輔助分析服務對象評估數據與趨勢</p>
         </div>
       </div>
 
@@ -30,11 +30,11 @@ const Analysis: React.FC = () => {
         <div className="flex-1 grid gap-4 sm:grid-cols-3">
           <div>
             <label htmlFor="case" className="text-sm font-medium text-gray-700 block mb-1">
-              選擇個案
+              選擇服務對象
             </label>
             <Select defaultValue="case1">
               <SelectTrigger id="case">
-                <SelectValue placeholder="選擇個案" />
+                <SelectValue placeholder="選擇服務對象" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="case1">王小明</SelectItem>
@@ -118,7 +118,7 @@ const Analysis: React.FC = () => {
                   王小明的基本能力檢核表顯示，他在社交互動能力有顯著表現（85分），生活自理能力居中（65分），但在時間管理與任務規劃方面較弱（40分）。他對結構化活動的參與度高，但在面對開放式任務時需要更多支持。建議加強時間管理訓練並提供視覺提示以增強任務完成度。
                 </p>
               </div>
-              
+
               <div className="grid gap-6 md:grid-cols-2">
                 <div>
                   <h3 className="font-medium mb-3">主要優勢</h3>
@@ -159,7 +159,7 @@ const Analysis: React.FC = () => {
                   綜合分析王小明的能力表現與趨勢變化，建議重點發展「情緒識別與自我調節」能力，同時維持社交互動的正向發展，並透過環境調整來提升學習專注力。以下策略採用漸進式、多感官及跨情境的教學原則，旨在提升技能泛化與自主應用能力。
                 </p>
               </div>
-              
+
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-medium mb-3 text-guardian-green">情緒識別與調節策略</h3>
@@ -184,7 +184,7 @@ const Analysis: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-lg font-medium mb-3 text-guardian-blue">專注力提升策略</h3>
                   <div className="space-y-3 pl-4">
@@ -208,7 +208,7 @@ const Analysis: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-lg font-medium mb-3 text-guardian-purple">社交互動維持與提升策略</h3>
                   <div className="space-y-3 pl-4">
@@ -232,7 +232,7 @@ const Analysis: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-lg font-medium mb-3 text-blue-500">家庭協作策略</h3>
                   <div className="space-y-3 pl-4">

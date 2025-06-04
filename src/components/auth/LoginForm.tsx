@@ -43,11 +43,11 @@ const LoginForm = () => {
     try {
       // 使用 API 服務進行登錄請求
       const response = await apiService.auth.login(values.username, values.password);
-      
+
       // 存儲返回的令牌
       if (response.access_token) {
         localStorage.setItem('authToken', response.access_token);
-        
+
         // 獲取用戶資料並更新 context
         try {
           const userData = await apiService.users.getCurrentUser();
@@ -71,60 +71,60 @@ const LoginForm = () => {
     }
   };
   return <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">守護樹</h1>
-        <p className="text-gray-600 mt-2">個案資料整合與洞察系統</p>
-      </div>
+    <div className="text-center mb-8">
+      <h1 className="text-2xl font-bold text-gray-800">守護樹</h1>
+      <p className="text-gray-600 mt-2">服務對象資料整合與洞察系統</p>
+    </div>
 
-      <div className="relative mb-6">
-        <div className="absolute inset-0 flex items-center">
-          <Separator className="w-full" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-muted-foreground">
-          </span>
-        </div>
+    <div className="relative mb-6">
+      <div className="absolute inset-0 flex items-center">
+        <Separator className="w-full" />
       </div>
-      
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField control={form.control} name="username" render={({
+      <div className="relative flex justify-center text-xs uppercase">
+        <span className="bg-white px-2 text-muted-foreground">
+        </span>
+      </div>
+    </div>
+
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField control={form.control} name="username" render={({
           field
         }) => <FormItem>
-                <FormLabel>使用者名稱</FormLabel>
-                <FormControl>
-                  <Input placeholder="請輸入使用者名稱" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>} />
-          
-          <FormField control={form.control} name="password" render={({
+            <FormLabel>使用者名稱</FormLabel>
+            <FormControl>
+              <Input placeholder="請輸入使用者名稱" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>} />
+
+        <FormField control={form.control} name="password" render={({
           field
         }) => <FormItem>
-                <FormLabel>密碼</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="請輸入密碼" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>} />
-          
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <input id="remember" type="checkbox" className="h-4 w-4 text-guardian-green focus:ring-guardian-green border-gray-300 rounded" />
-              <label htmlFor="remember" className="ml-2 block text-sm text-gray-900">
-                記住我
-              </label>
-            </div>
-            <a href="#" className="text-sm text-guardian-green hover:text-guardian-light-green">
-              忘記密碼?
-            </a>
+            <FormLabel>密碼</FormLabel>
+            <FormControl>
+              <Input type="password" placeholder="請輸入密碼" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>} />
+
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <input id="remember" type="checkbox" className="h-4 w-4 text-guardian-green focus:ring-guardian-green border-gray-300 rounded" />
+            <label htmlFor="remember" className="ml-2 block text-sm text-gray-900">
+              記住我
+            </label>
           </div>
-          
-          <Button type="submit" className="w-full bg-guardian-green hover:bg-guardian-light-green" disabled={isLoading}>
-            {isLoading ? "登入中..." : "登入"}
-          </Button>
-        </form>
-      </Form>
-    </div>;
+          <a href="#" className="text-sm text-guardian-green hover:text-guardian-light-green">
+            忘記密碼?
+          </a>
+        </div>
+
+        <Button type="submit" className="w-full bg-guardian-green hover:bg-guardian-light-green" disabled={isLoading}>
+          {isLoading ? "登入中..." : "登入"}
+        </Button>
+      </form>
+    </Form>
+  </div>;
 };
 export default LoginForm;
