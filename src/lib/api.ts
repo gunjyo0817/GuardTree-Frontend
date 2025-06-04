@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { Case, CaseCreate, CaseUpdate } from '@/types/case';
+
 interface AuthResponse {
   access_token: string;
   token_type: string;
@@ -191,6 +193,28 @@ export const apiService = {
       return api.put(`/users/me`, profileData);
     },
   },
+
+  cases: {
+    getAll: async (): Promise<Case[]> => {
+      return api.get('/cases/');
+    },
+
+    getById: async (caseId: string): Promise<Case> => {
+      return api.get(`/cases/${caseId}`);
+    },
+
+    create: async (caseData: CaseCreate): Promise<Case> => {
+      return api.post('/cases/', caseData);
+    },
+
+    update: async (caseId: string, caseData: CaseUpdate): Promise<Case> => {
+      return api.put(`/users/${caseId}`, caseData);
+    },
+
+    delete: async (caseId: string): Promise<unknown> => {
+      return api.delete(`/cases/${caseId}`);
+    },
+  }
 };
 
 export default apiService; 

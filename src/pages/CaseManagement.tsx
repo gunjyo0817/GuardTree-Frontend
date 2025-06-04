@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SearchIcon, UserPlus, X } from "lucide-react";
@@ -10,54 +10,169 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import CaseCard from "@/components/dashboard/CaseCard";
 
-const CaseManagement: React.FC = () => {
-  const [showNewCaseForm, setShowNewCaseForm] = useState(false);
-  
-  // Mock data for cases
-  const cases = [{
-    id: "case1",
-    name: "王小明",
-    age: 12,
-    gender: "male" as const,
-    category: "自閉症",
-    formsCount: 8,
-    lastUpdated: "2025-04-23T10:30:00",
-    status: "active" as const
-  }, {
-    id: "case2",
-    name: "李小花",
-    age: 9,
-    gender: "female" as const,
-    category: "發展遲緩",
-    formsCount: 5,
-    lastUpdated: "2025-04-21T15:45:00",
-    status: "critical" as const
-  }, {
-    id: "case3",
-    name: "張小華",
-    age: 15,
-    gender: "male" as const,
-    category: "學習障礙",
-    formsCount: 12,
-    lastUpdated: "2025-04-18T09:00:00",
-    status: "active" as const
-  }, {
-    id: "case4",
-    name: "陳小玉",
-    age: 7,
-    gender: "female" as const,
-    category: "注意力不足",
-    formsCount: 4,
-    lastUpdated: "2025-04-15T13:20:00",
-    status: "inactive" as const
-  }];
-  
-  const handleFormSubmit = (e: React.FormEvent) => {
+import { Case } from "@/types/case";
+import { apiService } from "@/lib/api";
+
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover"
+import { Checkbox } from "@/components/ui/checkbox"
+import { CaseCreate } from "@/types/case";
+
+const categories = ["第一類", "第二類", "第三類", "第七類", "其他", "舊制無法對照"]
+
+function MultiCategorySelect({ value, onChange }: { value: string[]; onChange: (newValue: string[]) => void; }) {
+  const toggleCategory = (category: string) => {
+    onChange(
+      value.includes(category)
+        ? value.filter(c => c !== category)
+        : [...value, category]
+    );
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" role="combobox" className="w-[200px] justify-start">
+          {value.length > 0 ? value.join(", ") : "選擇類別"}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px]">
+        {categories.map(category => (
+          <div key={category} className="flex items-center space-x-2 py-1">
+            <Checkbox
+              id={category}
+              checked={value.includes(category)}
+              onCheckedChange={() => toggleCategory(category)}
+            />
+            <label htmlFor={category} className="text-sm">
+              {category}
+            </label>
+          </div>
+        ))}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function finalizeDate(formData) {
+  const newData = { ...formData };
+  newData.birthdate = new Date(newData.birthdate);
+  return newData
+}
+
+function CaseForm({ setCases, setShowNewCaseForm }: { setCases: React.Dispatch<React.SetStateAction<unknown[]>>; setShowNewCaseForm: (v: boolean) => void; }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    birthdate: new Date().toISOString().split("T")[0],
+    gender: "male",
+    types: [],
+    caseDescription: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would save the new case data
+    const newCase = await apiService.cases.create(finalizeDate(formData));
+    setCases(prev => [...prev, newCase]);
     setShowNewCaseForm(false);
   };
-  
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">姓名</Label>
+          <Input
+            id="name"
+            value={formData.name}
+            onChange={e => setFormData({ ...formData, name: e.target.value })}
+            placeholder="請輸入姓名"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="birthdate">出生日期</Label>
+          <Input
+            id="birthdate"
+            type="date"
+            value={formData.birthdate}
+            onChange={e => setFormData({ ...formData, birthdate: e.target.value })}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>性別</Label>
+          <RadioGroup
+            value={formData.gender}
+            onValueChange={value => setFormData({ ...formData, gender: value })}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="male" id="male" />
+              <Label htmlFor="male">男</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="female" id="female" />
+              <Label htmlFor="female">女</Label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div className="space-y-2">
+          <Label>類別</Label>
+          <MultiCategorySelect
+            value={formData.types}
+            onChange={(types) => setFormData({ ...formData, types })}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="caseDescription">備註</Label>
+        <Input
+          id="caseDescription"
+          value={formData.caseDescription}
+          onChange={e => setFormData({ ...formData, caseDescription: e.target.value })}
+          placeholder="請輸入備註內容"
+        />
+      </div>
+
+      <div className="pt-4">
+        <Button type="submit">新增個案</Button>
+      </div>
+    </form>
+  );
+}
+
+const CaseManagement: React.FC = () => {
+  const [cases, setCases] = useState<Case[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [showNewCaseForm, setShowNewCaseForm] = useState(false);
+
+  useEffect(() => {
+    const fetchCases = async () => {
+      const data = await apiService.cases.getAll();
+      console.log(data[0].updated_at);
+      setCases(data);
+      setLoading(false);
+    };
+    fetchCases();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  const filteredCases = cases.filter((caseItem) =>
+    caseItem.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -68,7 +183,13 @@ const CaseManagement: React.FC = () => {
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative w-full sm:w-auto">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="搜尋個案..." className="w-full sm:w-[200px] pl-8" />
+            <Input
+              type="search"
+              placeholder="搜尋個案..."
+              className="w-full sm:w-[200px] pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <Button onClick={() => setShowNewCaseForm(true)}>
             <UserPlus className="h-4 w-4 mr-1.5" />
@@ -86,67 +207,7 @@ const CaseManagement: React.FC = () => {
             </Button>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">姓名</Label>
-                  <Input id="name" placeholder="請輸入姓名" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="age">年齡</Label>
-                  <Input id="age" type="number" placeholder="請輸入年齡" min="0" max="120" required />
-                </div>
-                <div className="space-y-2">
-                  <Label>性別</Label>
-                  <RadioGroup defaultValue="male" className="flex space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="male" id="male" />
-                      <Label htmlFor="male">男</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="female" id="female" />
-                      <Label htmlFor="female">女</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="category">類別</Label>
-                  <Select>
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="選擇類別" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="自閉症">自閉症</SelectItem>
-                      <SelectItem value="發展遲緩">發展遲緩</SelectItem>
-                      <SelectItem value="學習障礙">學習障礙</SelectItem>
-                      <SelectItem value="注意力不足">注意力不足</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="contactPerson">緊急聯絡人</Label>
-                  <Input id="contactPerson" placeholder="請輸入緊急聯絡人" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="contactNumber">聯絡電話</Label>
-                  <Input id="contactNumber" placeholder="請輸入聯絡電話" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="notes">備註</Label>
-                <textarea
-                  id="notes"
-                  className="w-full min-h-[100px] p-2 border rounded-md"
-                  placeholder="請輸入備註事項"
-                ></textarea>
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" type="button" onClick={() => setShowNewCaseForm(false)}>
-                  取消
-                </Button>
-                <Button type="submit">儲存</Button>
-              </div>
-            </form>
+            <CaseForm setCases={setCases} setShowNewCaseForm={setShowNewCaseForm} />
           </CardContent>
         </Card>
       ) : (
@@ -157,46 +218,55 @@ const CaseManagement: React.FC = () => {
               <TabsTrigger value="recent">最近更新</TabsTrigger>
             </TabsList>
           </div>
-          
+
           <TabsContent value="all" className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {cases.map(caseItem => (
-                <CaseCard 
-                  key={caseItem.id} 
-                  id={caseItem.id} 
-                  name={caseItem.name} 
-                  age={caseItem.age} 
-                  gender={caseItem.gender} 
-                  category={caseItem.category} 
-                  formsCount={caseItem.formsCount} 
-                  lastUpdated={caseItem.lastUpdated} 
-                  status={caseItem.status} 
-                  onClick={() => console.log(`查看個案：${caseItem.name}`)}
-                />
-              ))}
-            </div>
+            {filteredCases.length === 0 ? (
+              <p className="text-muted-foreground px-2">查無符合的個案</p>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {filteredCases.map(caseItem => (
+                  <CaseCard
+                    key={caseItem.id}
+                    id={caseItem.id}
+                    name={caseItem.name}
+                    birthdate={caseItem.birthdate}
+                    caseDescription={caseItem.caseDescription}
+                    gender={caseItem.gender}
+                    types={caseItem.types}
+                    formsCount={99}
+                    updated_at={caseItem.updated_at}
+                    onClick={() => console.log(`查看個案：${caseItem.name}`)}
+                  />
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="recent" className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {[...cases]
-                .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime())
-                .map(caseItem => (
-                  <CaseCard 
-                    key={caseItem.id} 
-                    id={caseItem.id} 
-                    name={caseItem.name} 
-                    age={caseItem.age} 
-                    gender={caseItem.gender} 
-                    category={caseItem.category} 
-                    formsCount={caseItem.formsCount} 
-                    lastUpdated={caseItem.lastUpdated} 
-                    status={caseItem.status}
-                    onClick={() => console.log(`查看個案：${caseItem.name}`)}
-                  />
-                ))
-              }
-            </div>
+            {filteredCases.length === 0 ? (
+              <p className="text-muted-foreground px-2">查無符合的個案</p>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {
+                  [...filteredCases]
+                    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+                    .map(caseItem => (
+                      <CaseCard
+                        key={caseItem.id}
+                        id={caseItem.id}
+                        name={caseItem.name}
+                        birthdate={caseItem.birthdate}
+                        caseDescription={caseItem.caseDescription}
+                        gender={caseItem.gender}
+                        types={caseItem.types}
+                        formsCount={99}
+                        updated_at={caseItem.updated_at}
+                        onClick={() => console.log(`查看個案：${caseItem.name}`)}
+                      />
+                    ))
+                }
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       )}
