@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -18,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useUser } from "@/contexts/UserContext";
 
 interface SidebarNavProps {
   collapsed: boolean;
@@ -31,6 +31,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
   userRole
 }) => {
   const isMobile = useIsMobile();
+  const { logout } = useUser();
   
   // Admin sees all menu items, caregivers only see some
   const navItems = [
@@ -129,6 +130,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
                 variant="ghost"
                 size="icon"
                 className="w-10 h-10 rounded-full mx-auto hover:bg-sidebar-accent text-white"
+                onClick={logout}
               >
                 <LogOut className="h-5 w-5" />
               </Button>
@@ -139,6 +141,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
           <Button
             variant="ghost"
             className="w-full justify-start hover:bg-sidebar-accent text-white"
+            onClick={logout}
           >
             <LogOut className="h-5 w-5 mr-3" />
             <span>登出</span>

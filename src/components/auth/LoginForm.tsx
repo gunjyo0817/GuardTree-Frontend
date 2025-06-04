@@ -12,6 +12,7 @@ import { ArrowRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 // 導入 API 服務
 import apiService from "@/lib/api";
+import { useUser } from "@/contexts/UserContext";
 
 // Define form schema with Zod
 const formSchema = z.object({
@@ -25,6 +26,7 @@ const formSchema = z.object({
 const LoginForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useUser();
 
   // Initialize the form with react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -45,8 +47,18 @@ const LoginForm = () => {
       // 存儲返回的令牌
       if (response.access_token) {
         localStorage.setItem('authToken', response.access_token);
-        toast.success("登入成功");
-        navigate("/cases");
+        
+        // 獲取用戶資料並更新 context
+        try {
+          const userData = await apiService.users.getCurrentUser();
+          setUser(userData);
+          toast.success("登入成功");
+          navigate("/cases", { replace: true });
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+          toast.error("登入成功但無法獲取用戶資料");
+          localStorage.removeItem('authToken');
+        }
       } else {
         toast.error("登入失敗，請檢查您的使用者名稱和密碼");
         console.error("Login error:", response);

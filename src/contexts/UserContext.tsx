@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiService } from '@/lib/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -14,7 +14,7 @@ interface User {
 interface UserContextType {
   user: User | null;
   loading: boolean;
-  setUser: (user: User | null) => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   logout: () => void;
 }
 
@@ -24,16 +24,26 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchUser = async () => {
+      // Skip fetching user data if we're on the login page or there's no auth token
+      if (location.pathname === '/login' || !localStorage.getItem('authToken')) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const userData = await apiService.users.getCurrentUser();
         setUser(userData);
       } catch (error) {
         console.error('Failed to fetch user:', error);
         if (error.response?.status === 401) {
-          navigate('/login', { replace: true });
+          localStorage.removeItem('authToken');
+          if (location.pathname !== '/login') {
+            navigate('/login', { replace: true });
+          }
         }
       } finally {
         setLoading(false);
@@ -41,11 +51,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     };
 
     fetchUser();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const logout = () => {
+    localStorage.removeItem('authToken');
     setUser(null);
-    // 這裡可以加入登出 API 的調用
     navigate('/login', { replace: true });
   };
 

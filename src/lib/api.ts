@@ -145,7 +145,7 @@ export const apiService = {
     },
 
     // 創建用戶
-    create: async (userData: { username: string; password: string; name: string; email: string }): Promise<UserData> => {
+    create: async (userData: { password: string; name: string; email: string }): Promise<UserData> => {
       return api.post('/users/', userData);
     },
 
