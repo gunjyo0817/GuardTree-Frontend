@@ -251,17 +251,14 @@ const FormFill: React.FC = () => {
                     1. 請依照實際觀察到的行為表現評分，避免主觀推測。
                   </p>
                   <p className="text-sm text-gray-700">
-                    2. 如有項目無法評估，請標記為「不適用」而非給予低分。
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    3. 系統會自動儲存您的填寫進度，可隨時暫停並稍後繼續。
+                    2. 如有項目無法評估，請標記為「N/A - 不適評估」而非給予低分。
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="font-medium">填寫後續流程</h3>
                   <p className="text-sm text-gray-700">
-                    1. 表單完成後，系統將自動分析並產生報告。
+                    1. 表單完成後，可至智慧分析頁面產生報告。
                   </p>
                   <p className="text-sm text-gray-700">
                     2. 與團隊討論評估結果並制定支持計畫。
