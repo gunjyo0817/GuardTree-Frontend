@@ -3,26 +3,20 @@ export interface FormItem {
   item: string;
   subitem?: string | null;
   core_area: string;
-  support_type?: number | null;
+  support_type: number;
 }
 
 export interface FormRecordCreate {
   case_id: number;
   user_id: number;
   year: number;
-  form_A: FormItem[];
-  form_B: FormItem[];
-  form_C: FormItem[];
-  form_D: FormItem[];
-  form_E: FormItem[];
-  form_F: FormItem[];
-  form_G: FormItem[];
+  form_type: string; // FormType ("A" | "B" | ...)
+  content: FormItem[];
 }
 
 export interface FormRecord extends FormRecordCreate {
   id: number;
   created_at: string; // ISO string
-  updated_at: string; // ISO string
 }
 
 export interface FormRecordResponse extends FormRecord {
@@ -35,18 +29,8 @@ export interface FormMetadata {
   case_id: number;
   user_id: number;
   created_at: string; // ISO string
-  updated_at: string; // ISO string
+  year: number;
+  form_type: string; // FormType
   case_name?: string | null;
   user_name?: string | null;
-}
-
-export interface FormRecordUpdate {
-  year?: number;
-  form_A?: FormItem[];
-  form_B?: FormItem[];
-  form_C?: FormItem[];
-  form_D?: FormItem[];
-  form_E?: FormItem[];
-  form_F?: FormItem[];
-  form_G?: FormItem[];
 }
