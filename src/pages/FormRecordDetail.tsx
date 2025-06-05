@@ -5,6 +5,8 @@ import { FormRecordResponse } from "@/types/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { formDefinitions } from "@/components/forms/FormPermissions";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
 
 const supportLabel = {
   4: "4 - 完全肢體協助",
@@ -39,6 +41,8 @@ const FormRecordDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [record, setRecord] = useState<FormRecordResponse | null>(null);
+  const [open, setOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -56,6 +60,42 @@ const FormRecordDetail: React.FC = () => {
         <Button variant="outline" onClick={() => navigate(-1)}>
           返回
         </Button>
+        <AlertDialog open={open} onOpenChange={setOpen}>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive">刪除表單</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>確定要刪除這筆表單紀錄嗎？</AlertDialogTitle>
+              <AlertDialogDescription>
+                此操作無法復原，確定要刪除？
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={deleting}
+                className="bg-red-600 hover:bg-red-700"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  setDeleting(true);
+                  try {
+                    await apiService.form.delete(Number(id));
+                    setOpen(false);
+                    toast({ title: "刪除成功", description: "表單紀錄已刪除" });
+                    navigate("/forms/records");
+                  } catch (err) {
+                    toast({ title: "刪除失敗", description: "請稍後再試", variant: "destructive" });
+                  } finally {
+                    setDeleting(false);
+                  }
+                }}
+              >
+                確定刪除
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <h1 className="text-3xl font-bold tracking-tight">表單詳情</h1>
       </div>
       <Card>

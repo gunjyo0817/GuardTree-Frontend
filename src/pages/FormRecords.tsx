@@ -26,7 +26,7 @@ const FormRecords: React.FC = () => {
     });
   }, []);
 
-  // 只在初次載入時執行
+  // only run once
   React.useEffect(() => {
     const params = new URLSearchParams(location.search);
     const initialSearch = params.get("search") || "";
@@ -38,7 +38,7 @@ const FormRecords: React.FC = () => {
         search: params.toString() ? `?${params.toString()}` : ""
       }, { replace: true });
     }
-  }, []); // 注意這裡依賴陣列為 []
+  }, []);
 
   // get all years
   const years = React.useMemo(() => {
