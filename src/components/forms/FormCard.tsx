@@ -36,7 +36,7 @@ const FormCard: React.FC<FormCardProps> = ({
     const y = date.getFullYear();
     const m = date.getMonth() + 1;
     const d = date.getDate();
-    return `${y}年 ${m}月 ${d}日`;
+    return `${y} 年 ${m} 月 ${d} 日`;
   };
 
   return (
