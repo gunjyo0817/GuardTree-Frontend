@@ -63,7 +63,7 @@ const FormRecords: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Button 
+          <Button
             onClick={() => navigate("/forms/fill")}
             className="bg-guardian-green hover:bg-guardian-light-green"
           >
@@ -109,7 +109,7 @@ const FormRecords: React.FC = () => {
               </TabsTrigger>
             ))}
           </TabsList>
-          
+
           <TabsContent value="all" className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {filteredRecords.map((record) => (
@@ -125,7 +125,7 @@ const FormRecords: React.FC = () => {
               ))}
             </div>
           </TabsContent>
-          
+
           {formDefinitions.map((form) => (
             <TabsContent key={form.id} value={form.id} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
