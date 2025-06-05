@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import formData from "@/data/form.json";
 
 type FieldType = 
   | 'text'
@@ -47,17 +47,27 @@ interface FormSection {
   fields: FormField[];
 }
 
+// 轉換 json 結構成 FormBuilder sections
+const mapFormJsonToSections = (formJson) => {
+  return Object.entries(formJson).map(([key, items]) => ({
+    id: key,
+    title: key.replace("form_", "") + " 項",
+    fields: items.map((item, idx) => ({
+      id: `${key}-${idx}`,
+      label: [item.activity, item.item, item.subitem].filter(Boolean).join(" - "),
+      type: "checkbox", // 你要什麼型態自己決定
+      required: false,
+    })),
+  }));
+};
+
+const sectionsFromJson = mapFormJsonToSections(formData);
+
 const FormBuilder: React.FC = () => {
   const navigate = useNavigate();
   const [formName, setFormName] = useState("");
   const [formDescription, setFormDescription] = useState("");
-  const [sections, setSections] = useState<FormSection[]>([
-    {
-      id: "section_" + Date.now(),
-      title: "基本資料",
-      fields: [],
-    },
-  ]);
+  const [sections, setSections] = useState<FormSection[]>(sectionsFromJson);
   const [activeTab, setActiveTab] = useState("design");
   
   const generateId = () => "_" + Math.random().toString(36).substr(2, 9);

@@ -11,28 +11,67 @@ export type Database = {
     Tables: {
       cases: {
         Row: {
-          birthdate: string | null
+          birthdate: string
           caseDescription: string | null
           created_at: string
+          gender: string
           id: number
-          name: string | null
+          name: string
+          types: string[]
           updated_at: string | null
         }
         Insert: {
-          birthdate?: string | null
+          birthdate: string
           caseDescription?: string | null
           created_at?: string
+          gender: string
           id?: number
-          name?: string | null
+          name: string
+          types: string[]
           updated_at?: string | null
         }
         Update: {
-          birthdate?: string | null
+          birthdate?: string
           caseDescription?: string | null
           created_at?: string
+          gender?: string
           id?: number
-          name?: string | null
+          name?: string
+          types?: string[]
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      forms: {
+        Row: {
+          case_id: number | null
+          content: Json | null
+          created_at: string
+          form_type: string | null
+          id: number
+          updated_at: string | null
+          user_id: number | null
+          year: number
+        }
+        Insert: {
+          case_id?: number | null
+          content?: Json | null
+          created_at?: string
+          form_type?: string | null
+          id?: number
+          updated_at?: string | null
+          user_id?: number | null
+          year: number
+        }
+        Update: {
+          case_id?: number | null
+          content?: Json | null
+          created_at?: string
+          form_type?: string | null
+          id?: number
+          updated_at?: string | null
+          user_id?: number | null
+          year?: number
         }
         Relationships: []
       }
@@ -41,97 +80,55 @@ export type Database = {
           created_at: string | null
           filled_form_id: number
           id: number
-          suggestions: string | null
-          summary: string | null
+          form_type: string
+          suggestions: Json | null
+          summary: Json | null
         }
         Insert: {
           created_at?: string | null
           filled_form_id: number
           id?: number
-          suggestions?: string | null
-          summary?: string | null
+          form_type: string
+          suggestions?: Json | null
+          summary?: Json | null
         }
         Update: {
           created_at?: string | null
           filled_form_id?: number
           id?: number
-          suggestions?: string | null
-          summary?: string | null
-        }
-        Relationships: []
-      }
-      LifeSupportFormFilled: {
-        Row: {
-          case_id: number | null
-          case_name: string | null
-          created_at: string
-          id: number
-          questions_A: Json | null
-          questions_B: Json | null
-          questions_C: Json | null
-          questions_D: Json | null
-          questions_E: Json | null
-          questions_F: Json | null
-          questions_G: Json | null
-          user_id: number | null
-          user_name: string | null
-        }
-        Insert: {
-          case_id?: number | null
-          case_name?: string | null
-          created_at?: string
-          id?: number
-          questions_A?: Json | null
-          questions_B?: Json | null
-          questions_C?: Json | null
-          questions_D?: Json | null
-          questions_E?: Json | null
-          questions_F?: Json | null
-          questions_G?: Json | null
-          user_id?: number | null
-          user_name?: string | null
-        }
-        Update: {
-          case_id?: number | null
-          case_name?: string | null
-          created_at?: string
-          id?: number
-          questions_A?: Json | null
-          questions_B?: Json | null
-          questions_C?: Json | null
-          questions_D?: Json | null
-          questions_E?: Json | null
-          questions_F?: Json | null
-          questions_G?: Json | null
-          user_id?: number | null
-          user_name?: string | null
+          form_type?: string
+          suggestions?: Json | null
+          summary?: Json | null
         }
         Relationships: []
       }
       users: {
         Row: {
+          activate: boolean | null
           created_at: string | null
           email: string | null
           id: number
-          isAdmin: boolean | null
+          isAdmin: boolean
           name: string | null
           password: string | null
           role: string
         }
         Insert: {
+          activate?: boolean | null
           created_at?: string | null
           email?: string | null
           id?: number
-          isAdmin?: boolean | null
+          isAdmin: boolean
           name?: string | null
           password?: string | null
           role: string
         }
         Update: {
+          activate?: boolean | null
           created_at?: string | null
           email?: string | null
           id?: number
-          isAdmin?: boolean | null
+          isAdmin?: boolean
           name?: string | null
           password?: string | null
           role?: string

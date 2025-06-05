@@ -138,7 +138,13 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
     if (!editingUser) return;
 
     try {
-      // 更新基本信息
+      // 更新基本資料
+      await apiService.users.updateUserInfo(editingUser.id, {
+        name: data.name,
+        email: data.email
+      });
+
+      // 更新角色和權限
       await apiService.users.updateRole(editingUser.id, {
         role: data.role
       });

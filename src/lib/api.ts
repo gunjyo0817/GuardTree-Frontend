@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { Case, CaseCreate, CaseUpdate } from '@/types/case';
+import { FormMetadata, FormRecord, FormRecordCreate, FormRecordResponse } from '@/types/form';
 
 interface AuthResponse {
   access_token: string;
@@ -206,6 +207,11 @@ export const apiService = {
       return api.put(`/users/me`, profileData);
     },
 
+    // Add user info update method
+    updateUserInfo: async (userId: string, userData: { name?: string; email?: string }): Promise<UserData> => {
+      return api.put(`/users/${userId}/info`, userData);
+    },
+
     // Add admin password update method
     adminUpdatePassword: async (userId: string, passwordData: { new_password: string }): Promise<void> => {
       return api.put(`/users/${userId}/admin-password`, passwordData);
@@ -232,6 +238,30 @@ export const apiService = {
     delete: async (caseId: string): Promise<unknown> => {
       return api.delete(`/cases/${caseId}`);
     },
+  },
+
+  form: {
+    getByCaseId: async (caseId: string): Promise<FormMetadata[]> => {
+      return api.get(`/forms/case/${caseId}`);
+    },
+    create: async (data: FormRecordCreate): Promise<FormRecord> => {
+      return api.post('/forms/', data);
+    },
+    getById: async (formId: number): Promise<FormRecordResponse> => {
+      return api.get(`/forms/${formId}`);
+    },
+    getAll: async (): Promise<FormMetadata[]> => {
+      return api.get('/forms/');
+    },
+  },
+
+  llm: {
+    analyze_form_data: async (case_id: string, year: string, form_type: string): Promise<any> => {
+      return api.post(`/llm/analyze/${case_id}/${year}/${form_type}`);
+    },
+    get_analyzed_result: async (case_id: string, year: string, form_type: string): Promise<any> => {
+      return api.get(`/llm/analyze/${case_id}/${year}/${form_type}`);
+    }
   }
 };
 

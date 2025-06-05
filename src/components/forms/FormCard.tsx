@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   FileText, 
@@ -17,9 +16,7 @@ interface FormCardProps {
   id: string;
   title: string;
   description?: string;
-  category?: string;
-  status?: "draft" | "published" | "archived";
-  updatedAt: string;
+  createdAt: string;
   type: "template" | "record";
   onClick?: () => void;
 }
@@ -28,9 +25,7 @@ const FormCard: React.FC<FormCardProps> = ({
   id,
   title,
   description,
-  category,
-  status = "published",
-  updatedAt,
+  createdAt,
   type,
   onClick,
 }) => {
@@ -69,17 +64,7 @@ const FormCard: React.FC<FormCardProps> = ({
                 <h3 className="font-semibold text-lg line-clamp-1">{title}</h3>
               </div>
             </div>
-            {status && (
-              <Badge 
-                className={cn(
-                  status === "published" && "bg-green-500", 
-                  status === "draft" && "bg-amber-500",
-                  status === "archived" && "bg-gray-500" 
-                )}
-              >
-                {status === "published" ? "已發布" : status === "draft" ? "草稿" : "已封存"}
-              </Badge>
-            )}
+            
           </div>
 
           {description && (
@@ -88,14 +73,10 @@ const FormCard: React.FC<FormCardProps> = ({
 
           <div className="mt-4 flex items-center text-sm text-gray-500">
             <Clock className="h-4 w-4 mr-1" />
-            <span>更新於：{formatDate(updatedAt)}</span>
+            <span>建立於：{formatDate(createdAt)}</span>
           </div>
 
-          {category && (
-            <Badge variant="outline" className="mt-3">
-              {category}
-            </Badge>
-          )}
+          
         </div>
       </CardContent>
       <CardFooter className="flex justify-between p-4 pt-0 border-t">
@@ -117,9 +98,6 @@ const FormCard: React.FC<FormCardProps> = ({
           <>
             <Button variant="ghost" size="sm" onClick={onClick}>
               <Eye className="h-4 w-4 mr-1" /> 查看
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onClick}>
-              <ChevronRight className="h-4 w-4" />
             </Button>
           </>
         )}
