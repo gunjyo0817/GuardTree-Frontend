@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,8 @@ import {
   Edit, 
   ChevronRight,
   Copy,
-  Clock
+  Clock,
+  Calendar
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ interface FormCardProps {
   title: string;
   description?: string;
   createdAt: string;
+  year?: string | number;
   type: "template" | "record";
   onClick?: () => void;
 }
@@ -26,16 +27,16 @@ const FormCard: React.FC<FormCardProps> = ({
   title,
   description,
   createdAt,
+  year,
   type,
   onClick,
 }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat("zh-TW", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(date);
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    return `${y}年 ${m}月 ${d}日`;
   };
 
   return (
@@ -76,7 +77,12 @@ const FormCard: React.FC<FormCardProps> = ({
             <span>建立於：{formatDate(createdAt)}</span>
           </div>
 
-          
+          {year && (
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <Calendar className="h-4 w-4 mr-1" />
+              <span>年度：{year}</span>
+            </div>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex justify-between p-4 pt-0 border-t">
