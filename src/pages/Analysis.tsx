@@ -29,13 +29,13 @@ const Analysis: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [hasExistingAnalysis, setHasExistingAnalysis] = useState<boolean>(false);
   const formOptions = [
-    { value: "form_A", label: "居家活動" },
-    { value: "form_B", label: "社區生活活動" },
-    { value: "form_C", label: "終身學習" },
-    { value: "form_D", label: "作業活動" },
-    { value: "form_E", label: "健康與安全活動" },
-    { value: "form_F", label: "社交活動" },
-    { value: "form_G", label: "保護與倡議活動" },
+    { value: "A", label: "A - 居家活動" },
+    { value: "B", label: "B - 社區生活活動" },
+    { value: "C", label: "C - 終身學習" },
+    { value: "D", label: "D - 作業活動" },
+    { value: "E", label: "E - 健康與安全活動" },
+    { value: "F", label: "F - 社交活動" },
+    { value: "G", label: "G - 保護與倡議活動" },
   ];
   
   useEffect(() => {

@@ -80,7 +80,7 @@ export type Database = {
           created_at: string | null
           filled_form_id: number
           id: number
-          question_field: string
+          form_type: string
           suggestions: Json | null
           summary: Json | null
         }
@@ -88,7 +88,7 @@ export type Database = {
           created_at?: string | null
           filled_form_id: number
           id?: number
-          question_field: string
+          form_type: string
           suggestions?: Json | null
           summary?: Json | null
         }
@@ -96,7 +96,7 @@ export type Database = {
           created_at?: string | null
           filled_form_id?: number
           id?: number
-          question_field?: string
+          form_type?: string
           suggestions?: Json | null
           summary?: Json | null
         }
