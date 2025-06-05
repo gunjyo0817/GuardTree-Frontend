@@ -268,7 +268,7 @@ const Analysis: React.FC = () => {
           <CardContent className="py-8">
             <div className="text-center text-gray-500">
               <Sparkles className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>請選擇個案、表單和日期，然後點擊「生成分析」開始 AI 智慧分析</p>
+              <p>請選擇服務對象、表單和年度，然後點擊「生成分析」開始 AI 智慧分析</p>
             </div>
           </CardContent>
         </Card>
