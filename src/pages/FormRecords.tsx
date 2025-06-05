@@ -139,6 +139,7 @@ const FormRecords: React.FC = () => {
                       title={`${record.case_name || ""}`}
                       description={`${formDefinitions.find(f => f.id === record.form_type)?.name}`}
                       createdAt={record.created_at}
+                      year={record.year}
                       type="record"
                       onClick={() => navigate(`/forms/records/${record.id}`)}
                     />
