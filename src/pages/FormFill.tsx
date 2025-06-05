@@ -1,39 +1,54 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formDefinitions, useFormPermissions } from "@/components/forms/FormPermissions";
+import { formDefinitions } from "@/components/forms/FormPermissions";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { apiService } from "@/lib/api";
+import formData from "@/data/form.json";
+
+function makeKey(q: any) {
+  return [q.activity, q.item, q.subitem].join("|");
+}
+
+const supportOptions = [
+  { value: 4, label: "4 - 完全肢體協助" },
+  { value: 3, label: "3 - 部分身體協助" },
+  { value: 2, label: "2 - 示範/口頭/手勢提示" },
+  { value: 1, label: "1 - 監督陪同" },
+  { value: 0, label: "0 - 不需協助" },
+  { value: -1, label: "N/A - 不適評估" },
+];
 
 const FormFill: React.FC = () => {
   const navigate = useNavigate();
   const [selectedForm, setSelectedForm] = useState("");
   const [selectedCase, setSelectedCase] = useState("");
   const [step, setStep] = useState<"select" | "fill">("select");
+  const [cases, setCases] = useState<{ id: number, name: string }[]>([]);
+  const [loadingCases, setLoadingCases] = useState(true);
+  const [answers, setAnswers] = useState<Record<string, number | null>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [showErrors, setShowErrors] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id: string, name: string } | null>(null);
 
-  // In a real app, this would come from authentication/context
-  const mockUserState = {
-    name: "陳主任",
-    role: "admin" as "admin" | "caregiver",
-    jobTitle: "主任",
-  };
+  useEffect(() => {
+    const fetchCases = async () => {
+      const data = await apiService.cases.getAll();
+      setCases(data.map(c => ({ id: c.id, name: c.name })));
+      setLoadingCases(false);
+    };
+    fetchCases();
+  }, []);
 
-  // Get forms this user can access
-  const accessibleForms = useFormPermissions(mockUserState.role, mockUserState.jobTitle);
-
-  // Mock cases data
-  const cases = [
-    { id: "case1", name: "王小明" },
-    { id: "case2", name: "李小花" },
-    { id: "case3", name: "張小華" },
-    { id: "case4", name: "陳小玉" },
-  ];
+  useEffect(() => {
+    apiService.users.getCurrentUser().then(user => setCurrentUser(user));
+  }, []);
 
   const handleStartForm = () => {
     if (!selectedForm || !selectedCase) {
@@ -48,15 +63,67 @@ const FormFill: React.FC = () => {
     setStep("fill");
   };
 
-  const handleSubmitForm = () => {
-    toast({
-      title: "表單已提交",
-      description: "表單已成功提交並儲存",
-    });
+  const handleSubmitForm = async () => {
+    const questions = formData[selectedForm] || [];
+    const missing = questions
+      .map(q => makeKey(q))
+      .filter(key => answers[key] == null);
+    if (missing.length > 0) {
+      setShowErrors(true);
+      toast({
+        title: "有尚未填寫的欄位",
+        description: "請完成所有題目",
+        variant: "destructive",
+      });
+      setTouched(t => {
+        const newTouched = { ...t };
+        missing.forEach(q => { newTouched[q] = true; });
+        return newTouched;
+      });
+      return;
+    }
+    setShowErrors(false);
 
-    setTimeout(() => {
-      navigate("/forms/records");
-    }, 1500);
+    const year = new Date().getFullYear();
+    const existingForms = await apiService.form.getByCaseId(selectedCase);
+    const existing = existingForms.find(f => new Date(f.created_at).getFullYear() === year);
+
+    // 你選的那一張表的 key
+    const formKey = `${selectedForm}`;
+    // 你選的那一張表的題目
+    const newItems = formData[selectedForm].map(q => ({
+      activity: q.activity,
+      item: q.item,
+      subitem: q.subitem,
+      core_area: q.core_area,
+      support_type: answers[makeKey(q)],
+    }));
+
+    let payload;
+    if (!currentUser) {
+      toast({ title: "請先登入" });
+      return;
+    }
+    payload = {
+      case_id: Number(selectedCase),
+      user_id: currentUser.id,
+      year,
+      form_type: formKey,
+      content: newItems,
+    };
+    await apiService.form.create(payload);
+
+    try {
+      toast({
+        title: "表單已提交",
+        description: "表單已成功提交並儲存",
+      });
+      setTimeout(() => {
+        navigate("/forms/records");
+      }, 1500);
+    } catch (err: any) {
+      toast({ title: "送出失敗", description: err?.response?.data?.detail || "請稍後再試", variant: "destructive" });
+    }
   };
 
   // Render form selection step
@@ -81,11 +148,14 @@ const FormFill: React.FC = () => {
                   <SelectValue placeholder="選擇服務對象" />
                 </SelectTrigger>
                 <SelectContent>
-                  {cases.map((caseItem) => (
-                    <SelectItem key={caseItem.id} value={caseItem.id}>
-                      {caseItem.name}
-                    </SelectItem>
-                  ))}
+                  {loadingCases
+                    ? <div className="p-2 text-gray-400">載入中...</div>
+                    : cases.map((caseItem) => (
+                        <SelectItem key={caseItem.id} value={caseItem.id.toString()}>
+                          {caseItem.name}
+                        </SelectItem>
+                      ))
+                  }
                 </SelectContent>
               </Select>
             </div>
@@ -102,7 +172,7 @@ const FormFill: React.FC = () => {
                   <SelectValue placeholder="選擇表單類型" />
                 </SelectTrigger>
                 <SelectContent>
-                  {accessibleForms.map((form) => (
+                  {formDefinitions.map((form) => (
                     <SelectItem key={form.id} value={form.id}>
                       {form.name}
                     </SelectItem>
@@ -181,17 +251,14 @@ const FormFill: React.FC = () => {
                     1. 請依照實際觀察到的行為表現評分，避免主觀推測。
                   </p>
                   <p className="text-sm text-gray-700">
-                    2. 如有項目無法評估，請標記為「不適用」而非給予低分。
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    3. 系統會自動儲存您的填寫進度，可隨時暫停並稍後繼續。
+                    2. 如有項目無法評估，請標記為「N/A - 不適評估」而非給予低分。
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="font-medium">填寫後續流程</h3>
                   <p className="text-sm text-gray-700">
-                    1. 表單完成後，系統將自動分析並產生報告。
+                    1. 表單完成後，可至智慧分析頁面產生報告。
                   </p>
                   <p className="text-sm text-gray-700">
                     2. 與團隊討論評估結果並制定支持計畫。
@@ -211,9 +278,27 @@ const FormFill: React.FC = () => {
   // Render form filling step for the selected form
   const renderFormFilling = () => {
     const selectedFormData = formDefinitions.find(form => form.id === selectedForm);
-    const selectedCaseData = cases.find(c => c.id === selectedCase);
+    const selectedCaseData = cases.find(c => c.id.toString() === selectedCase);
 
     if (!selectedFormData || !selectedCaseData) return null;
+
+    // 這裡載入對應的題目
+    const questions = formData[selectedForm] || [];
+    const missing = questions
+      .map(q => makeKey(q))
+      .filter(key => answers[key] == null);
+
+    // group by activity > item
+    const grouped = questions.reduce((acc, q) => {
+      if (!acc[q.activity]) acc[q.activity] = {};
+      if (q.subitem) {
+        if (!acc[q.activity][q.item]) acc[q.activity][q.item] = [];
+        acc[q.activity][q.item].push(q);
+      } else {
+        acc[q.activity][q.item] = q;
+      }
+      return acc;
+    }, {} as Record<string, Record<string, any>>);
 
     return (
       <div className="space-y-6">
@@ -246,7 +331,7 @@ const FormFill: React.FC = () => {
                 <label className="text-sm font-medium text-gray-700 block mb-1">
                   填表人員
                 </label>
-                <Input defaultValue={mockUserState.name} readOnly />
+                <Input defaultValue={currentUser?.name || ""} readOnly />
               </div>
             </div>
 
@@ -268,86 +353,47 @@ const FormFill: React.FC = () => {
             <CardDescription>請依照觀察情形填寫各項目的評估結果</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              {/* Mock form items based on selected form */}
-              {selectedForm === "basic-ability-checklist" && (
-                <>
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-lg">認知能力</h3>
-                    <div className="border rounded-lg p-4 space-y-4">
-                      <FormItem
-                        question="1. 能夠辨識與理解基本概念（如顏色、形狀、數量）"
-                        options={["不會", "部分會", "大部分會", "完全會"]}
-                      />
-                      <FormItem
-                        question="2. 能夠理解簡單的口語指令"
-                        options={["不會", "部分會", "大部分會", "完全會"]}
-                      />
-                      <FormItem
-                        question="3. 能夠記住日常生活中的重要資訊"
-                        options={["不會", "部分會", "大部分會", "完全會"]}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-lg">社交互動</h3>
-                    <div className="border rounded-lg p-4 space-y-4">
-                      <FormItem
-                        question="1. 能夠適當地與他人互動"
-                        options={["不會", "部分會", "大部分會", "完全會"]}
-                      />
-                      <FormItem
-                        question="2. 能夠理解他人的情緒反應"
-                        options={["不會", "部分會", "大部分會", "完全會"]}
-                      />
-                      <FormItem
-                        question="3. 能夠在團體活動中參與"
-                        options={["不會", "部分會", "大部分會", "完全會"]}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {selectedForm === "three-level-prevention" && (
-                <>
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-lg">第一級預防</h3>
-                    <div className="border rounded-lg p-4 space-y-4">
-                      <FormItem
-                        question="1. 環境調整的需求程度"
-                        options={["低度", "中度", "高度", "極高度"]}
-                      />
-                      <FormItem
-                        question="2. 日常作息的結構化需求"
-                        options={["低度", "中度", "高度", "極高度"]}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-lg">第二級預防</h3>
-                    <div className="border rounded-lg p-4 space-y-4">
-                      <FormItem
-                        question="1. 情緒調節的支持需求"
-                        options={["低度", "中度", "高度", "極高度"]}
-                      />
-                      <FormItem
-                        question="2. 專注力維持的支持需求"
-                        options={["低度", "中度", "高度", "極高度"]}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {(selectedForm === "daily-life-function-b" || selectedForm === "aging-assessment" || selectedForm === "swallowing-difficulty") && (
-                <div className="flex items-center justify-center p-8 text-center text-gray-500">
-                  <p>表單內容正在載入中，請稍後...</p>
+            {Object.entries(grouped).map(([activity, items]) => (
+              <div key={activity} className="mb-10 border rounded-lg p-6 bg-gray-50">
+                <h3 className="font-semibold text-lg mb-4">{activity}</h3>
+                <div>
+                  {Object.entries(items).map(([item, value]) => {
+                    if (Array.isArray(value)) {
+                      // 有 subitem
+                      return (
+                        <div key={item} className="mb-6">
+                          <div className="font-medium mb-3 mt-4">{item}</div>
+                          <div>
+                            {value.map((q, idx) => (
+                              <FormItem
+                                key={idx}
+                                question={makeKey(q)}
+                                label={q.subitem}
+                                className="mb-5"
+                                error={showErrors && answers[makeKey(q)] == null}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      // 沒 subitem
+                      const q = value;
+                      return (
+                        <div key={item} className="mb-6">
+                          <FormItem
+                            question={makeKey(q)}
+                            label={q.item}
+                            className="mb-5"
+                            error={showErrors && answers[makeKey(q)] == null}
+                          />
+                        </div>
+                      );
+                    }
+                  })}
                 </div>
-              )}
-            </div>
+              </div>
+            ))}
 
             <div className="mt-8 flex justify-end space-x-4">
               <Button variant="outline" onClick={() => setStep("select")}>
@@ -363,16 +409,29 @@ const FormFill: React.FC = () => {
     );
   };
 
-  // Simple form item component
-  const FormItem = ({ question, options }: { question: string, options: string[] }) => (
-    <div className="space-y-2">
-      <p className="font-medium">{question}</p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {options.map((option, i) => (
-          <label key={i} className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
-            <input type="radio" name={`q-${question.slice(0, 10)}`} className="accent-guardian-green" />
-            <span>{option}</span>
-          </label>
+  const FormItem = ({ question, label, className = "", error }) => (
+    <div className={`space-y-2 ${className}`}>
+      <p className="font-medium">{label}</p>
+      <div className={`grid grid-cols-2 sm:grid-cols-6 gap-4 ${error ? "border border-red-500 rounded" : ""}`}>
+        {supportOptions.map((option) => (
+          <div
+            key={option.value}
+            className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer text-xs"
+            onClick={() => {
+              setAnswers(a => ({ ...a, [question]: option.value }));
+              setTouched(t => ({ ...t, [question]: true }));
+            }}
+          >
+            <input
+              type="radio"
+              name={`q-${question}`}
+              value={option.value}
+              checked={answers[question] === option.value}
+              onChange={() => {}}
+              className="accent-guardian-green"
+            />
+            <span>{option.label}</span>
+          </div>
         ))}
       </div>
     </div>

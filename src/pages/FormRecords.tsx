@@ -1,40 +1,41 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, Plus } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import FormCard from "@/components/forms/FormCard";
 import { useNavigate } from "react-router-dom";
 import { formDefinitions } from "@/components/forms/FormPermissions";
+import { apiService } from "@/lib/api";
+import { FormMetadata } from "@/types/form";
 
 const FormRecords: React.FC = () => {
   const navigate = useNavigate();
-  
-  // Mock form records data
-  const formRecords = [
-    {
-      id: "record1",
-      title: "王小明 - 生活功能支持評量",
-      description: "2025年第一季度評估結果",
-      category: "日常生活功能支持型態評量 – B 版",
-      updatedAt: "2025-04-28T10:30:00",
-    },
-    {
-      id: "record2",
-      title: "李小花 - 基本能力檢核表",
-      description: "入班評估",
-      category: "基本能力檢核表",
-      updatedAt: "2025-04-24T14:20:00",
-    },
-    {
-      id: "record6",
-      title: "李小花 - 基本能力檢核表",
-      description: "複評結果",
-      category: "基本能力檢核表",
-      updatedAt: "2025-04-10T13:10:00",
-    },
-  ];
+  const [records, setRecords] = React.useState<FormMetadata[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [search, setSearch] = React.useState("");
+  const [year, setYear] = React.useState<string>("");
+  const [activeTab, setActiveTab] = React.useState("all");
+
+  React.useEffect(() => {
+    apiService.form.getAll().then(data => {
+      setRecords(data);
+      setLoading(false);
+    });
+  }, []);
+
+  // get all years
+  const years = React.useMemo(() => {
+    const y = Array.from(new Set(records.map(r => r.year))).sort((a, b) => b - a);
+    return y.map(String);
+  }, [records]);
+
+  // filter records
+  const filteredRecords = records.filter(r => {
+    const matchCase = r.case_name?.includes(search);
+    const matchYear = year ? String(r.year) === year : true;
+    return matchCase && matchYear;
+  });
 
   return (
     <div className="space-y-6">
@@ -59,60 +60,77 @@ const FormRecords: React.FC = () => {
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="relative w-full sm:w-auto">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="搜尋表單..." className="pl-8 w-full sm:w-[300px]" />
+          <Input
+            placeholder="搜尋服務對象..."
+            className="pl-8 w-full sm:w-[300px]"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
-        <Button variant="outline" size="sm">
-          <Filter className="h-4 w-4 mr-1.5" />
-          篩選
-        </Button>
+        <div className="flex items-center gap-2">
+          <select
+            className="border rounded px-2 py-1 text-sm"
+            value={year}
+            onChange={e => setYear(e.target.value)}
+          >
+            <option value=""> 全部年份 </option>
+            {years.map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <Tabs defaultValue="all" className="space-y-4">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="all">所有表單</TabsTrigger>
-          {formDefinitions.map((form) => (
-            <TabsTrigger key={form.id} value={form.id}>
-              {form.name}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        
-        <TabsContent value="all" className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {formRecords.map((record) => (
-              <FormCard
-                key={record.id}
-                id={record.id}
-                title={record.title}
-                description={record.description}
-                category={record.category}
-                updatedAt={record.updatedAt}
-                type="record"
-              />
+      {loading ? (
+        <div className="text-center text-gray-400 py-10">載入中...</div>
+      ) : (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="all">所有表單</TabsTrigger>
+            {formDefinitions.map((form) => (
+              <TabsTrigger key={form.id} value={form.id}>
+                {form.name.slice(13)}
+              </TabsTrigger>
             ))}
-          </div>
-        </TabsContent>
-        
-        {formDefinitions.map((form) => (
-          <TabsContent key={form.id} value={form.id} className="space-y-4">
+          </TabsList>
+          
+          <TabsContent value="all" className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {formRecords
-                .filter((record) => record.category === form.name)
-                .map((record) => (
-                  <FormCard
-                    key={record.id}
-                    id={record.id}
-                    title={record.title}
-                    description={record.description}
-                    category={record.category}
-                    updatedAt={record.updatedAt}
-                    type="record"
-                  />
-                ))}
+              {filteredRecords.map((record) => (
+                <FormCard
+                  key={record.id}
+                  id={record.id.toString()}
+                  title={`${record.case_name || ""}`}
+                  description={`${formDefinitions.find(f => f.id === record.form_type)?.name}`}
+                  createdAt={record.created_at}
+                  type="record"
+                  onClick={() => navigate(`/forms/records/${record.id}`)}
+                />
+              ))}
             </div>
           </TabsContent>
-        ))}
-      </Tabs>
+          
+          {formDefinitions.map((form) => (
+            <TabsContent key={form.id} value={form.id} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredRecords
+                  .filter((record) => record.form_type === form.id)
+                  .map((record) => (
+                    <FormCard
+                      key={record.id}
+                      id={record.id.toString()}
+                      title={`${record.case_name || ""}`}
+                      description={`${formDefinitions.find(f => f.id === record.form_type)?.name}`}
+                      createdAt={record.created_at}
+                      type="record"
+                      onClick={() => navigate(`/forms/records/${record.id}`)}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
     </div>
   );
 };

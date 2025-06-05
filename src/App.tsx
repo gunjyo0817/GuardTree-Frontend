@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
 import FormFill from "./pages/FormFill";
 import UserProfile from "./pages/UserProfile";
+import FormRecordDetail from "./pages/FormRecordDetail";
 
 // Layouts
 import MainLayout from "./components/layout/MainLayout";
@@ -49,6 +50,7 @@ const ProtectedRoutes = () => {
         <Route path="analysis" element={<Analysis />} />
         <Route path="users" element={<Users />} />
         <Route path="profile" element={<UserProfile />} />
+        <Route path="forms/records/:id" element={<FormRecordDetail />} />
       </Routes>
     </MainLayout>
   );
