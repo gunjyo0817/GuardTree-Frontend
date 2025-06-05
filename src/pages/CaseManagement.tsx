@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import CaseCard from "@/components/dashboard/CaseCard";
 import CaseDetailPanel from "@/components/cases/CaseDetailPanel";
+import { useNavigate } from "react-router-dom";
 
 import { Case } from "@/types/case";
 import { apiService } from "@/lib/api";
@@ -125,6 +125,7 @@ function CaseForm({ setCases, setShowNewCaseForm }: { setCases: React.Dispatch<R
 
         <div className="space-y-2">
           <Label>類別</Label>
+          <br />
           <MultiCategorySelect
             value={formData.types}
             onChange={(types) => setFormData({ ...formData, types })}
@@ -150,12 +151,13 @@ function CaseForm({ setCases, setShowNewCaseForm }: { setCases: React.Dispatch<R
 }
 
 const CaseManagement: React.FC = () => {
-  const [cases, setCases] = useState<Case[]>([]);
+  const [cases, setCases] = useState<(Case & { formCnt: number })[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [showNewCaseForm, setShowNewCaseForm] = useState(false);
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [isDetailPanelOpen, setIsDetailPanelOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCases = async () => {
@@ -168,11 +170,11 @@ const CaseManagement: React.FC = () => {
   }, []);
 
   const handleCaseClick = (caseItem: Case) => {
-    setSelectedCase(caseItem);
-    setIsDetailPanelOpen(true);
+    // 跳轉到表單紀錄頁，並帶上搜尋關鍵字
+    navigate(`/forms/records?search=${encodeURIComponent(caseItem.name)}`);
   };
 
-  const handleCaseUpdate = (updatedCase: Case) => {
+  const handleCaseUpdate = (updatedCase: (Case & { formCnt: number })) => {
     setCases(prev => prev.map(c => c.id === updatedCase.id ? updatedCase : c));
   };
 
@@ -248,9 +250,13 @@ const CaseManagement: React.FC = () => {
                     caseDescription={caseItem.caseDescription}
                     gender={caseItem.gender}
                     types={caseItem.types}
-                    formsCount={99}
+                    formsCount={caseItem.formCnt}
                     updated_at={caseItem.updated_at}
                     onClick={() => handleCaseClick(caseItem)}
+                    onDetailClick={() => {
+                      setSelectedCase(caseItem);
+                      setIsDetailPanelOpen(true);
+                    }}
                   />
                 ))}
               </div>
@@ -274,9 +280,13 @@ const CaseManagement: React.FC = () => {
                         caseDescription={caseItem.caseDescription}
                         gender={caseItem.gender}
                         types={caseItem.types}
-                        formsCount={99}
+                        formsCount={caseItem.formCnt}
                         updated_at={caseItem.updated_at}
                         onClick={() => handleCaseClick(caseItem)}
+                        onDetailClick={() => {
+                          setSelectedCase(caseItem);
+                          setIsDetailPanelOpen(true);
+                        }}
                       />
                     ))
                 }

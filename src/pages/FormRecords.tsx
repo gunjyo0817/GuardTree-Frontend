@@ -4,16 +4,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import FormCard from "@/components/forms/FormCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { formDefinitions } from "@/components/forms/FormPermissions";
 import { apiService } from "@/lib/api";
 import { FormMetadata } from "@/types/form";
 
 const FormRecords: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [records, setRecords] = React.useState<FormMetadata[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [search, setSearch] = React.useState("");
+  const [search, setSearch] = React.useState(""); // 先設為空
   const [year, setYear] = React.useState<string>("");
   const [activeTab, setActiveTab] = React.useState("all");
 
@@ -23,6 +25,20 @@ const FormRecords: React.FC = () => {
       setLoading(false);
     });
   }, []);
+
+  // 只在初次載入時執行
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const initialSearch = params.get("search") || "";
+    if (initialSearch) {
+      setSearch(initialSearch);
+      params.delete("search");
+      navigate({
+        pathname: location.pathname,
+        search: params.toString() ? `?${params.toString()}` : ""
+      }, { replace: true });
+    }
+  }, []); // 注意這裡依賴陣列為 []
 
   // get all years
   const years = React.useMemo(() => {
@@ -47,7 +63,7 @@ const FormRecords: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Button 
+          <Button
             onClick={() => navigate("/forms/fill")}
             className="bg-guardian-green hover:bg-guardian-light-green"
           >
@@ -93,7 +109,7 @@ const FormRecords: React.FC = () => {
               </TabsTrigger>
             ))}
           </TabsList>
-          
+
           <TabsContent value="all" className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {filteredRecords.map((record) => (
@@ -109,7 +125,7 @@ const FormRecords: React.FC = () => {
               ))}
             </div>
           </TabsContent>
-          
+
           {formDefinitions.map((form) => (
             <TabsContent key={form.id} value={form.id} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

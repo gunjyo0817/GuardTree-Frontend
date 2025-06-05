@@ -124,7 +124,7 @@ const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-[500px] sm:w-[540px]">
-        <SheetHeader className="flex flex-row items-center justify-between">
+        <SheetHeader className="flex flex-col items-center justify-between">
           <SheetTitle className="text-xl font-bold">
             個案詳情 - {caseData.name}
           </SheetTitle>
