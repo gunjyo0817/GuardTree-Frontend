@@ -255,6 +255,9 @@ export const apiService = {
     getAll: async (): Promise<FormMetadata[]> => {
       return api.get('/forms/');
     },
+    delete: async (formId: number): Promise<void> => {
+      return api.delete(`/forms/${formId}`);
+    },
   },
 
   llm: {
