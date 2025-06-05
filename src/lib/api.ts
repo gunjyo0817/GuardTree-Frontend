@@ -7,7 +7,7 @@ interface AuthResponse {
   access_token: string;
   token_type: string;
 }
-  
+
 
 export interface UserData {
   id: string;
@@ -87,7 +87,7 @@ api.interceptors.response.use(
     // 如果是超時錯誤且還沒有重試過
     if (error.code === 'ECONNABORTED' && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       // 對於登入請求，使用更長的超時時間重試
       if (originalRequest.url === '/auth/login') {
         originalRequest.timeout = 90000; // 90秒
@@ -103,7 +103,7 @@ api.interceptors.response.use(
     if (error.response) {
       // 服務器響應了，但狀態碼不是2xx
       console.error('API Error:', error.response.status, error.response.data);
-      
+
       if (error.response.status === 401) {
         localStorage.removeItem('authToken');
         window.location.href = '/login';
@@ -144,7 +144,7 @@ export const apiService = {
       const params = new URLSearchParams();
       params.append('username', username);
       params.append('password', password);
-      
+
       return api.post('/auth/login', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -152,7 +152,7 @@ export const apiService = {
       });
     },
   },
-  
+
   // 用戶相關
   users: {
     // 獲取所有用戶
@@ -221,13 +221,21 @@ export const apiService = {
   cases: {
     getAll: async (): Promise<(Case & { formCnt: number })[]> => {
       const cases: Case[] = await api.get('/cases/');
-      // 並行抓取每個 case 的 form 數量
-      const casesWithFormCnt = await Promise.all(
-        cases.map(async (c) => {
-          const forms = await apiService.form.getByCaseId(c.id.toString());
-          return { ...c, formCnt: forms.length };
-        })
-      );
+      const forms: FormMetadata[] = await apiService.form.getAll();
+
+      // 建立 caseId -> form count 的對照表
+      const formCountMap: Record<string, number> = {};
+      forms.forEach(form => {
+        const caseId = String(form.case_id);
+        formCountMap[caseId] = (formCountMap[caseId] || 0) + 1;
+      });
+
+      // 合併 formCnt
+      const casesWithFormCnt = cases.map(c => ({
+        ...c,
+        formCnt: formCountMap[String(c.id)] || 0,
+      }));
+
       return casesWithFormCnt;
     },
 
@@ -275,4 +283,4 @@ export const apiService = {
   }
 };
 
-export default apiService; 
+export default apiService;
