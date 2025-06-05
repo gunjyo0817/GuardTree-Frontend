@@ -85,28 +85,44 @@ const UserProfile: React.FC = () => {
   // 提交表單
   const onSubmit = async (values: ProfileFormValues) => {
     try {
-      // 如果有更改基本資料
-      if (values.name || values.email) {
-        await apiService.users.updateMe({
-            name: values.name || form.getValues("name"),
-            email: values.email || form.getValues("email"),
-        })
+      // 準備更新資料
+      const updateData: {
+        name?: string;
+        email?: string;
+        old_password?: string;
+        new_password?: string;
+      } = {};
+
+      // 獲取當前用戶資料來進行比較
+      const currentUser = await apiService.users.getCurrentUser();
+
+      // 只在值有變化時添加到更新資料中
+      if (values.name && values.name !== currentUser.name) {
+        updateData.name = values.name;
+      }
+      if (values.email && values.email !== currentUser.email) {
+        updateData.email = values.email;
       }
 
-      // 如果有更改密碼
+      // 添加密碼更新
       if (values.new_password) {
-        await apiService.users.updatePassword({
-          old_password: values.current_password,
-          new_password: values.new_password,
-        });
+        updateData.old_password = values.current_password;
+        updateData.new_password = values.new_password;
       }
 
-      toast.success("資料已更新");
+      // 如果有任何需要更新的資料，就發送請求
+      if (Object.keys(updateData).length > 0) {
+        await apiService.users.updateMe(updateData);
+        toast.success("資料已更新");
+      } else {
+        toast.info("沒有資料變更");
+      }
+
       setIsEditing(false);
       fetchUserProfile();
     } catch (error) {
       console.error("Failed to update profile:", error);
-      toast.error("更新資料失敗");
+      toast.error("目前密碼輸入錯誤");
     }
   };
 
