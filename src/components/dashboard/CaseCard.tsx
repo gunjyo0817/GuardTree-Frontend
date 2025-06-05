@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +12,7 @@ interface CaseCardProps extends Omit<Case, 'created_at'> {
   formsCount: number;
   avatarUrl?: string;
   onClick?: () => void;
+  onDetailClick?: () => void;
 }
 
 const CaseCard: React.FC<CaseCardProps> = ({
@@ -20,11 +20,12 @@ const CaseCard: React.FC<CaseCardProps> = ({
   name,
   gender,
   types,
-  formsCount=99,
+  formsCount = 99,
   updated_at,
   avatarUrl,
   birthdate,
   onClick,
+  onDetailClick,
 }) => {
   const formatDate = (date: Date) => {
     return new Date(date).toISOString().split('T')[0]
@@ -44,7 +45,7 @@ const CaseCard: React.FC<CaseCardProps> = ({
   };
 
   return (
-    <Card 
+    <Card
       className="overflow-hidden h-full transition-all hover:border-guardian-green cursor-pointer"
       onClick={onClick}
     >
@@ -90,7 +91,16 @@ const CaseCard: React.FC<CaseCardProps> = ({
         </div>
       </CardContent>
       <CardFooter className="flex justify-end p-4 pt-0 border-t">
-        <Button variant="ghost" size="sm">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={e => {
+            e.stopPropagation();
+            if (onDetailClick) {
+              onDetailClick();
+            }
+          }}
+        >
           查看詳情 <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
       </CardFooter>

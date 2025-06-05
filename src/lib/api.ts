@@ -219,12 +219,22 @@ export const apiService = {
   },
 
   cases: {
-    getAll: async (): Promise<Case[]> => {
-      return api.get('/cases/');
+    getAll: async (): Promise<(Case & { formCnt: number })[]> => {
+      const cases: Case[] = await api.get('/cases/');
+      // 並行抓取每個 case 的 form 數量
+      const casesWithFormCnt = await Promise.all(
+        cases.map(async (c) => {
+          const forms = await apiService.form.getByCaseId(c.id.toString());
+          return { ...c, formCnt: forms.length };
+        })
+      );
+      return casesWithFormCnt;
     },
 
-    getById: async (caseId: string): Promise<Case> => {
-      return api.get(`/cases/${caseId}`);
+    getById: async (caseId: string): Promise<Case & { formCnt: number }> => {
+      const c: Case = await api.get(`/cases/${caseId}`);
+      const forms = await apiService.form.getByCaseId(caseId);
+      return { ...c, formCnt: forms.length };
     },
 
     create: async (caseData: CaseCreate): Promise<Case> => {
