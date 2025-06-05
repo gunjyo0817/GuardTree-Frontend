@@ -226,7 +226,7 @@ export const apiService = {
     },
 
     update: async (caseId: string, caseData: CaseUpdate): Promise<Case> => {
-      return api.put(`/users/${caseId}`, caseData);
+      return api.put(`/cases/${caseId}`, caseData);
     },
 
     delete: async (caseId: string): Promise<unknown> => {
