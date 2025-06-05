@@ -10,12 +10,6 @@ import { AnalysisResult } from '@/types/llm';
 import { apiService } from "@/lib/api";
 
 const Analysis: React.FC = () => {
-  const [selectedDates] = useState([
-    "2023",
-    "2024",
-    "2025",
-    "2026",
-  ]);
   const [cases, setCases] = useState<{ id: number; name: string | null }[]>([]);
   const [pendingCase, setPendingCase] = useState<string>("");
   const [pendingForm, setPendingForm] = useState<string>("");
@@ -28,6 +22,8 @@ const Analysis: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [hasExistingAnalysis, setHasExistingAnalysis] = useState<boolean>(false);
+  const [years, setYears] = useState<string[]>([]);
+  const [forms, setForms] = useState<any[]>([]);
   const formOptions = [
     { value: "A", label: "A - 居家活動" },
     { value: "B", label: "B - 社區生活活動" },
@@ -39,12 +35,18 @@ const Analysis: React.FC = () => {
   ];
   
   useEffect(() => {
-    const fetchCases = async () => {
+    const fetchCasesAndForms = async () => {
       const data = await apiService.cases.getAll();
-      console.log("data: ", data);
       setCases(data);
+
+      const formRecords = await apiService.form.getAll();
+      setForms(formRecords);
+      const yearList = Array.from(new Set(formRecords.map(r => r.year)))
+        .sort((a, b) => b - a)
+        .map(String);
+      setYears(yearList);
     };
-    fetchCases();
+    fetchCasesAndForms();
   }, []);
 
   const handleGenerateAnalysis = async () => {
@@ -84,6 +86,24 @@ const Analysis: React.FC = () => {
     }
   };
 
+  const availableFormTypes = React.useMemo(() => {
+    if (!pendingCase) return [];
+    const types = forms
+      .filter(f => String(f.case_id) === pendingCase)
+      .map(f => f.form_type);
+    return Array.from(new Set(types));
+  }, [forms, pendingCase]);
+
+  const filteredFormOptions = formOptions.filter(opt => availableFormTypes.includes(opt.value));
+
+  const availableYears = React.useMemo(() => {
+    if (!pendingCase || !pendingForm) return [];
+    const years = forms
+      .filter(f => String(f.case_id) === pendingCase && f.form_type === pendingForm)
+      .map(f => f.year);
+    return Array.from(new Set(years)).sort((a, b) => b - a).map(String);
+  }, [forms, pendingCase, pendingForm]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -121,7 +141,7 @@ const Analysis: React.FC = () => {
                 <SelectValue placeholder="選擇表單" />
               </SelectTrigger>
               <SelectContent>
-                {formOptions.map((option) => (
+                {filteredFormOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -131,16 +151,16 @@ const Analysis: React.FC = () => {
           </div>
           <div>
             <label htmlFor="date" className="text-sm font-medium text-gray-700 block mb-1">
-              填寫日期
+              選擇年度
             </label>
             <Select value={pendingDate} onValueChange={setPendingDate}>
               <SelectTrigger id="date">
-                <SelectValue placeholder="選擇年分" />
+                <SelectValue placeholder="選擇年度" />
               </SelectTrigger>
               <SelectContent>
-                {selectedDates.map((date) => (
-                  <SelectItem key={date} value={date}>
-                    {date}
+                {availableYears.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -248,7 +268,7 @@ const Analysis: React.FC = () => {
           <CardContent className="py-8">
             <div className="text-center text-gray-500">
               <Sparkles className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>請選擇個案、表單和日期，然後點擊「生成分析」開始 AI 智慧分析</p>
+              <p>請選擇服務對象、表單和年度，然後點擊「生成分析」開始 AI 智慧分析</p>
             </div>
           </CardContent>
         </Card>
