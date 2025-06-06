@@ -138,31 +138,28 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
     if (!editingUser) return;
 
     try {
-      // 更新基本資料
-      await apiService.users.updateUserInfo(editingUser.id, {
+      // 使用新的統一API接口一次性更新所有用戶資料
+      const updateData: {
+        name?: string;
+        email?: string;
+        role?: UserData['role'];
+        isAdmin?: boolean;
+        activate?: boolean;
+        new_password?: string;
+      } = {
         name: data.name,
-        email: data.email
-      });
+        email: data.email,
+        role: data.role,
+        isAdmin: data.isAdmin,
+        activate: data.activate,
+      };
 
-      // 更新角色和權限
-      await apiService.users.updateRole(editingUser.id, {
-        role: data.role
-      });
-
-      await apiService.users.updateAdmin(editingUser.id, {
-        isAdmin: data.isAdmin
-      });
-
-      await apiService.users.updateActivate(editingUser.id, {
-        activate: data.activate
-      });
-
-      // 如果有輸入新密碼，則更新密碼
+      // 如果有輸入新密碼，則添加到更新資料中
       if (data.password) {
-        await apiService.users.adminUpdatePassword(editingUser.id, {
-          new_password: data.password
-        });
+        updateData.new_password = data.password;
       }
+
+      await apiService.users.adminUpdate(editingUser.id, updateData);
 
       toast.success("用戶資料已更新");
       setEditingUser(null);

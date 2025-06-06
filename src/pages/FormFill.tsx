@@ -36,6 +36,7 @@ const FormFill: React.FC = () => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [showErrors, setShowErrors] = useState(false);
   const [currentUser, setCurrentUser] = useState<{ id: string, name: string } | null>(null);
+  const [formYear, setFormYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     const fetchCases = async () => {
@@ -84,9 +85,8 @@ const FormFill: React.FC = () => {
     }
     setShowErrors(false);
 
-    const year = new Date().getFullYear();
     const existingForms = await apiService.form.getByCaseId(selectedCase);
-    const existing = existingForms.find(f => new Date(f.created_at).getFullYear() === year);
+    const existing = existingForms.find(f => new Date(f.created_at).getFullYear() === formYear);
 
     // 你選的那一張表的 key
     const formKey = `${selectedForm}`;
@@ -107,7 +107,7 @@ const FormFill: React.FC = () => {
     payload = {
       case_id: Number(selectedCase),
       user_id: currentUser.id,
-      year,
+      year: formYear,
       form_type: formKey,
       content: newItems,
     };
@@ -323,9 +323,15 @@ const FormFill: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-gray-700 block mb-1">
-                  填表日期
+                  填寫表單年度
                 </label>
-                <Input type="date" defaultValue={new Date().toISOString().split('T')[0]} />
+                <Input
+                  type="number"
+                  min={2000}
+                  max={2100}
+                  value={formYear}
+                  onChange={e => setFormYear(Number(e.target.value))}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700 block mb-1">

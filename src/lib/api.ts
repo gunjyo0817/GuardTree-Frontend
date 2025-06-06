@@ -35,6 +35,8 @@ interface UpdateUserData {
 interface UpdateProfileData {
   name?: string;
   email?: string;
+  old_password?: string;
+  new_password?: string;
 }
 
 interface UpdateRoleData extends UpdateUserData {
@@ -47,6 +49,16 @@ interface UpdateActivateData {
 
 interface UpdateAdminData {
   isAdmin: boolean;
+}
+
+// 添加管理員用戶更新接口
+export interface AdminUserUpdateData {
+  name?: string;
+  email?: string;
+  role?: UserData['role'];
+  isAdmin?: boolean;
+  activate?: boolean;
+  new_password?: string;
 }
 
 // 直接從環境變量獲取API URL
@@ -170,16 +182,6 @@ export const apiService = {
       return api.get('/users/me');
     },
 
-    // 更新當前用戶信息
-    updateCurrentUser: async (userData: UpdateUserData): Promise<UserData> => {
-      return api.put('/users/me', userData);
-    },
-
-    // 更新當前用戶密碼
-    updatePassword: async (passwordData: UpdatePasswordData): Promise<void> => {
-      return api.put('/users/me/password', passwordData);
-    },
-
     // 獲取特定用戶
     getById: async (userId: string): Promise<UserData> => {
       return api.get(`/users/${userId}`);
@@ -190,31 +192,13 @@ export const apiService = {
       return api.delete(`/users/${userId}`);
     },
 
-    // 更新用戶角色
-    updateRole: async (userId: string, roleData: UpdateRoleData): Promise<UserData> => {
-      return api.put(`/users/${userId}/role`, roleData);
-    },
-
-    updateActivate: async (userId: string, activateData: UpdateActivateData): Promise<UserData> => {
-      return api.put(`/users/${userId}/activate`, activateData);
-    },
-
-    updateAdmin: async (userId: string, adminData: UpdateAdminData): Promise<UserData> => {
-      return api.put(`/users/${userId}/admin`, adminData);
+    // 管理員統一更新用戶資料 - 新的統一接口
+    adminUpdate: async (userId: string, userData: AdminUserUpdateData): Promise<UserData> => {
+      return api.put(`/users/${userId}`, userData);
     },
 
     updateMe: async (profileData: UpdateProfileData): Promise<UserData> => {
       return api.put(`/users/me`, profileData);
-    },
-
-    // Add user info update method
-    updateUserInfo: async (userId: string, userData: { name?: string; email?: string }): Promise<UserData> => {
-      return api.put(`/users/${userId}/info`, userData);
-    },
-
-    // Add admin password update method
-    adminUpdatePassword: async (userId: string, passwordData: { new_password: string }): Promise<void> => {
-      return api.put(`/users/${userId}/admin-password`, passwordData);
     },
   },
 
@@ -270,6 +254,9 @@ export const apiService = {
     },
     getAll: async (): Promise<FormMetadata[]> => {
       return api.get('/forms/');
+    },
+    delete: async (formId: number): Promise<void> => {
+      return api.delete(`/forms/${formId}`);
     },
   },
 
