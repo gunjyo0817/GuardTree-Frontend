@@ -175,7 +175,7 @@ const CaseManagement: React.FC = () => {
   };
 
   const handleCaseUpdate = (updatedCase: (Case & { formCnt: number })) => {
-    setCases(prev => prev.map(c => c.id === updatedCase.id ? updatedCase : c));
+    setCases(prev => prev.map(c => c.id === updatedCase.id ? { ...updatedCase, formCnt: c.formCnt } : c));
   };
 
   const handleCaseDelete = (caseId: number) => {

@@ -20,7 +20,7 @@ const CaseCard: React.FC<CaseCardProps> = ({
   name,
   gender,
   types,
-  formsCount = 99,
+  formsCount,
   updated_at,
   avatarUrl,
   birthdate,
