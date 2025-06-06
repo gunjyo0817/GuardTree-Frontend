@@ -126,7 +126,7 @@ const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
       <SheetContent className="w-[500px] sm:w-[540px]">
         <SheetHeader className="flex flex-col items-center justify-between">
           <SheetTitle className="text-xl font-bold">
-            個案詳情 - {caseData.name}
+            服務對象詳情 - {caseData.name}
           </SheetTitle>
           <div className="flex items-center gap-2">
             {isEditing ? (
@@ -145,7 +145,7 @@ const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                 編輯
               </Button>
             )}
-            
+
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button size="sm" variant="destructive">
@@ -155,9 +155,9 @@ const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>確認刪除個案</AlertDialogTitle>
+                  <AlertDialogTitle>確認刪除服務對象</AlertDialogTitle>
                   <AlertDialogDescription>
-                    您確定要刪除個案「{caseData.name}」嗎？此動作無法復原。
+                    您確定要刪除服務對象「{caseData.name}」嗎？此動作無法復原。
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -261,7 +261,7 @@ const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
             <div className="text-sm text-gray-500 space-y-1">
               <div>建立時間：{new Date(caseData.created_at).toLocaleString('zh-TW')}</div>
               <div>最後更新：{new Date(caseData.updated_at).toLocaleString('zh-TW')}</div>
-              <div>個案編號：#{caseData.id}</div>
+              <div>服務對象編號：#{caseData.id}</div>
             </div>
           </div>
         </div>

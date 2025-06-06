@@ -37,7 +37,7 @@ const Analysis: React.FC = () => {
     { value: "F", label: "F - 社交活動" },
     { value: "G", label: "G - 保護與倡議活動" },
   ];
-  
+
   useEffect(() => {
     const fetchCases = async () => {
       const data = await apiService.cases.getAll();
@@ -147,8 +147,8 @@ const Analysis: React.FC = () => {
             </Select>
           </div>
         </div>
-        <Button 
-          onClick={handleGenerateAnalysis} 
+        <Button
+          onClick={handleGenerateAnalysis}
           className="bg-guardian-green hover:bg-guardian-light-green whitespace-nowrap h-10 mt-4 sm:mt-6"
           disabled={isLoading}
         >
@@ -180,7 +180,7 @@ const Analysis: React.FC = () => {
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle>{ cases.find((c) => c.id.toString() === selectedCase)?.name || selectedCase} - 日常生活功能支持型態評量分析</CardTitle>
+                    <CardTitle>{cases.find((c) => c.id.toString() === selectedCase)?.name || selectedCase} - 日常生活功能支持型態評量分析</CardTitle>
                     <CardDescription>根據{selectedDate}年{formOptions.find((f) => f.value === selectedForm)?.label || selectedForm}表單的評估資料分析</CardDescription>
                   </div>
                 </div>
@@ -195,7 +195,7 @@ const Analysis: React.FC = () => {
                     {analysisResult.summary.summary}
                   </p>
                 </div>
-                
+
                 <div className="grid gap-6">
                   <div>
                     <h3 className="font-medium mb-3">主要優勢</h3>
@@ -248,7 +248,7 @@ const Analysis: React.FC = () => {
           <CardContent className="py-8">
             <div className="text-center text-gray-500">
               <Sparkles className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>請選擇個案、表單和日期，然後點擊「生成分析」開始 AI 智慧分析</p>
+              <p>請選擇服務對象、表單和日期，然後點擊「生成分析」開始 AI 智慧分析</p>
             </div>
           </CardContent>
         </Card>
