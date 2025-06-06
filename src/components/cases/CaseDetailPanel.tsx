@@ -145,7 +145,7 @@ const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                 編輯
               </Button>
             )}
-            
+
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button size="sm" variant="destructive">
